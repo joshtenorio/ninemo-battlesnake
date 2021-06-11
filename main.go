@@ -103,6 +103,51 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	possibleMoves := []string{"up", "down", "left", "right"}
 	move := possibleMoves[rand.Intn(len(possibleMoves))]
 
+	// get board size and current position of our head
+	// board size info is in here and not HandleStart in case we are playing two different games at once with different board sizes
+	var xMin, yMin int = 0
+	var xMax int = request.board.width
+	var yMax int = request.board.height
+
+	var xHead int = request.battlesnake.head.x
+	var yHead int = request.battlesnake.head.y
+
+	// make sure we aren't hitting a wall
+	switch move {
+	case "up":
+		// if we are hitting the upper wall and towards the left, move right
+		if yHead + 1 >= yMax && xHead < xMax / 2 {
+			move = "right"
+		}
+		else {
+			move = "left"
+		}
+	case "down":
+		// if we are hitting the lower wall and towards the left, move right
+		if yHead - 1 <= yMin && xHead < xMax / 2 {
+			move = "right"
+		}
+		else {
+			move = "left"
+		}
+	case "left":
+		// if we are hitting the left wall and downwards, move up
+		if xHead + 1 <= xMin && yHead < yMax / 2 {
+			move = "up"
+		}
+		else {
+			move = "down"
+		}
+	case "right":
+		// if we are hitting the right wall and downwards, move up
+		if xHead + 1 >= xMax && yHead < yMax / 2 {
+			move = "up"
+		}
+		else {
+			move = "down"
+		}
+	}
+
 	response := MoveResponse{
 		Move: move,
 	}
