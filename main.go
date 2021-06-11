@@ -102,6 +102,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	// Choose a random direction to move in
 	possibleMoves := []string{"up", "down", "left", "right"}
 	move := possibleMoves[rand.Intn(len(possibleMoves))]
+	fmt.Printf("INIT MOVE: %s\n", move)
 
 	// get board size and current position of our head
 	// board size info is in here and not HandleStart in case we are playing two different games at once with different board sizes
@@ -113,33 +114,34 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	var yHead int = request.You.Head.Y
 
 	// make sure we aren't running into a wall
+	// TODO: put this in a loop in case we are in a corner
 	switch move {
 	case "up":
 		// if we are hitting the upper wall and towards the left, move right
 		if yHead + 1 >= yMax && xHead < xMax / 2 {
 			move = "right"
-		} else {
+		} else if yHead + 1 >= yMax {
 			move = "left"
 		}
 	case "down":
 		// if we are hitting the lower wall and towards the left, move right
-		if yHead - 1 <= yMin && xHead < xMax / 2 {
+		if yHead - 1 < yMin && xHead < xMax / 2 {
 			move = "right"
-		} else {
+		} else if yHead - 1 < yMin {
 			move = "left"
 		}
 	case "left":
 		// if we are hitting the left wall and downwards, move up
-		if xHead - 1 <= xMin && yHead < yMax / 2 {
+		if xHead - 1 < xMin && yHead < yMax / 2 {
 			move = "up"
-		} else {
+		} else if xHead - 1 < xMin {
 			move = "down"
 		}
 	case "right":
 		// if we are hitting the right wall and downwards, move up
 		if xHead + 1 >= xMax && yHead < yMax / 2 {
 			move = "up"
-		} else {
+		} else if xHead + 1 >= xMax {
 			move = "down"
 		}
 	default:
