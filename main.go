@@ -112,7 +112,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	var xHead int = request.battlesnake.head.x
 	var yHead int = request.battlesnake.head.y
 
-	// make sure we aren't hitting a wall
+	// make sure we aren't running into a wall
 	switch move {
 	case "up":
 		// if we are hitting the upper wall and towards the left, move right
@@ -146,6 +146,8 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		else {
 			move = "down"
 		}
+	default:
+		// do nothing, proceed as normal
 	}
 
 	response := MoveResponse{
