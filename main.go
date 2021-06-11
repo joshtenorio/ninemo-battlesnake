@@ -105,12 +105,12 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 
 	// get board size and current position of our head
 	// board size info is in here and not HandleStart in case we are playing two different games at once with different board sizes
-	var xMin, yMin int = 0
-	var xMax int = request.board.width
-	var yMax int = request.board.height
+	var xMin, yMin int = 0, 0
+	var xMax int = request.Board.Width
+	var yMax int = request.Board.Height
 
-	var xHead int = request.battlesnake.head.x
-	var yHead int = request.battlesnake.head.y
+	var xHead int = request.You.Head.X
+	var yHead int = request.You.Head.Y
 
 	// make sure we aren't running into a wall
 	switch move {
