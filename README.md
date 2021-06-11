@@ -1,0 +1,2 @@
+# ninemo-bot
+Go battlesnake
