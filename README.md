@@ -1,4 +1,5 @@
 # ninemo-bot
-Go battlesnake
+Go [battlesnake](https://play.battlesnake.com/)
 
-readme WIP
+- the live version is on branch `main`
+- in-progress code is on branch `dev`
