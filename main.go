@@ -130,7 +130,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		}
 	case "left":
 		// if we are hitting the left wall and downwards, move up
-		if xHead + 1 <= xMin && yHead < yMax / 2 {
+		if xHead - 1 <= xMin && yHead < yMax / 2 {
 			move = "up"
 		} else {
 			move = "down"
