@@ -5,7 +5,7 @@ Go [battlesnake](https://play.battlesnake.com/)
 - in-progress code is on branch `dev`
 
 ## Challenges
-[ ] avoid walls
-[ ] avoid ourselves
-[ ] avoid other snakes
-[ ] find food
+- [x] avoid walls
+- [ ] avoid ourselves
+- [ ] avoid other snakes
+- [ ] find food

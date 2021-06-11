@@ -99,10 +99,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	// Choose a random direction to move in
-	possibleMoves := []string{"up", "down", "left", "right"}
-	move := possibleMoves[rand.Intn(len(possibleMoves))]
-	fmt.Printf("INIT MOVE: %s\n", move)
+	
 
 	// get board size and current position of our head
 	// board size info is in here and not HandleStart in case we are playing two different games at once with different board sizes
@@ -112,6 +109,16 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 
 	var xHead int = request.You.Head.X
 	var yHead int = request.You.Head.Y
+
+	
+
+	// Choose a random direction to move in
+	possibleMoves := []string{"up", "down", "left", "right"}
+
+	// TODO: get parts of our snake that is adjacent to head so we can not run into ourself
+	// eliminate moves from possibleMoves
+	move := possibleMoves[rand.Intn(len(possibleMoves))]
+	fmt.Printf("INITIAL MOVE: %s\n", move)
 
 	// make sure we aren't running into a wall
 	// TODO: put this in a loop in case we are in a corner
@@ -152,7 +159,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		Move: move,
 	}
 
-	fmt.Printf("MOVE: %s\n", response.Move)
+	fmt.Printf("CHOSEN MOVE: %s\n", response.Move)
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
