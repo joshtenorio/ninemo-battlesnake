@@ -231,7 +231,7 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 			futureUs := movesUs[i]
 			for j := 0; j < len(movesEnemy); j++ {
 				futureEnemy := movesEnemy[j]
-				if futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y {
+				if (futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y) && isMovePossible(us, board, indexToMove(i)) {
 					return indexToMove(i)
 				}
 			} // end for j
