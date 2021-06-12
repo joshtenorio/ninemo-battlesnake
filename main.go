@@ -103,9 +103,12 @@ func isMovePossible(head *Coord, board *Board, move string) bool {
 
 /*
 returns valid move if we win a head-to-head, else returns a move that avoids it
+if there is no head-to-head, return null
 */
-func detectHeadToHead(us *Coord, board *Board, moves []string) string {
+func detectHeadToHead(us *Coord, board *Board, validMoves []string) string {
+	// get list of heads that are close to us (not including ourself)
 
+	return "null"
 }
 
 // HandleIndex is called when your Battlesnake is created and refreshed
@@ -165,30 +168,37 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		legalMoves = append(legalMoves, "right")
 	}
 
-	// if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
+	// if there is a potential head to head, go for it if we can win, else avoid
 	move := "null"
+	move = detectHeadToHead(&head, &request.Board, legalMoves)
 
-	// else, find closest food and path to it if possible
-	dist := 90000 // TODO: change this to actual max value of int, lookup golang spec
-	food := request.Board.Food
-	var closestFood Coord
-	for i := 0; i < len(food); i++ {
-		if (food[i].X-head.X)*(food[i].X-head.X)+(food[i].Y-head.Y)*(food[i].Y-head.Y) < dist {
-			dist = (food[i].X-head.X)*(food[i].X-head.X) + (food[i].Y-head.Y)*(food[i].Y-head.Y)
-			closestFood = food[i]
-		}
+	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
+	if move == "null" {
+		// put hazard code in here
 	}
+	// else, find closest food and path to it if possible
+	if move == "null" {
+		dist := 90000 // TODO: change this to actual max value of int, lookup golang spec
+		food := request.Board.Food
+		var closestFood Coord
+		for i := 0; i < len(food); i++ {
+			if (food[i].X-head.X)*(food[i].X-head.X)+(food[i].Y-head.Y)*(food[i].Y-head.Y) < dist {
+				dist = (food[i].X-head.X)*(food[i].X-head.X) + (food[i].Y-head.Y)*(food[i].Y-head.Y)
+				closestFood = food[i]
+			}
+		}
 
-	// attempt to go in the direction of the closestFood
-	var dx, dy int = closestFood.X - head.X, closestFood.Y - head.Y
-	if dx > 0 && isMovePossible(&head, &request.Board, "right") {
-		move = "right"
-	} else if dx < 0 && isMovePossible(&head, &request.Board, "left") {
-		move = "left"
-	} else if dy > 0 && isMovePossible(&head, &request.Board, "up") {
-		move = "up"
-	} else if dy < 0 && isMovePossible(&head, &request.Board, "down") {
-		move = "down"
+		// attempt to go in the direction of the closestFood
+		var dx, dy int = closestFood.X - head.X, closestFood.Y - head.Y
+		if dx > 0 && isMovePossible(&head, &request.Board, "right") {
+			move = "right"
+		} else if dx < 0 && isMovePossible(&head, &request.Board, "left") {
+			move = "left"
+		} else if dy > 0 && isMovePossible(&head, &request.Board, "up") {
+			move = "up"
+		} else if dy < 0 && isMovePossible(&head, &request.Board, "down") {
+			move = "down"
+		}
 	}
 
 	// if we can't go in direction of closest food, just pick a random move
