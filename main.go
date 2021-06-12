@@ -81,6 +81,28 @@ func indexToMove(num int) string {
 }
 
 /*
+given a move and initial position, calculate final position
+*/
+func moveToCoord(move string, position *Coord) Coord {
+	output := Coord{-1, -1}
+	switch move {
+	case "up":
+		output.X = position.X
+		output.Y = position.Y + 1
+	case "down":
+		output.X = position.X
+		output.Y = position.Y - 1
+	case "left":
+		output.X = position.X - 1
+		output.Y = position.Y
+	case "right":
+		output.X = position.X + 1
+		output.Y = position.Y
+	}
+	return output
+}
+
+/*
 returns true if move is possible, false if otherwise
 doesn't take into consideration head to head collisions
 */
@@ -161,24 +183,25 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 
 	// before continuing, determine all possible moves since we need it for both cases
 	movesUs := []Coord{{us.X, us.Y + 1}, {us.X, us.Y - 1}, {us.X - 1, us.Y}, {us.X + 1, us.Y}}
+
 	movesEnemy := []Coord{{enemyHead.X, enemyHead.Y + 1}, {enemyHead.X, enemyHead.Y - 1}, {enemyHead.X - 1, enemyHead.Y}, {enemyHead.X + 1, enemyHead.Y}}
 
 	// determine if we can beat them
 	if ourLength <= enemyLength {
 		// pick something that avoids them because we'll lose
-		for i := 0; i < len(movesUs); i++ {
-			us := movesUs[i]
+		for i := 0; i < len(movesEnemy); i++ {
+			future := movesUs[i]
 			enemy := movesEnemy[i]
-			if us.X != enemy.X || us.Y != enemy.Y {
+			if (future.X != enemy.X || future.Y != enemy.Y) && isMovePossible(&future, board, indexToMove(i)) {
 				return indexToMove(i)
 			}
 		}
 	} else if ourLength > enemyLength {
 		// pick the move that results in h2h collision
 		for i := 0; i < len(movesEnemy); i++ {
-			us := movesUs[i]
+			future := movesUs[i]
 			enemy := movesEnemy[i]
-			if us.X == enemy.X && us.Y == enemy.Y {
+			if future.X == enemy.X && future.Y == enemy.Y {
 				return indexToMove(i)
 			}
 		}
