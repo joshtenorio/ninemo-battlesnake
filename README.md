@@ -9,4 +9,5 @@ Go [battlesnake](https://play.battlesnake.com/)
 - [x] avoid ourselves
 - [x] avoid other snakes
 - [x] find food
+- [ ] avoid hazard zones when health <= 50 (half)
 - [ ] avoid traps

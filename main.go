@@ -30,10 +30,11 @@ type Battlesnake struct {
 }
 
 type Board struct {
-	Height int           `json:"height"`
-	Width  int           `json:"width"`
-	Food   []Coord       `json:"food"`
-	Snakes []Battlesnake `json:"snakes"`
+	Height  int           `json:"height"`
+	Width   int           `json:"width"`
+	Food    []Coord       `json:"food"`
+	Snakes  []Battlesnake `json:"snakes"`
+	Hazards []Coord       `json:"hazards"`
 }
 
 type BattlesnakeInfoResponse struct {
@@ -100,6 +101,13 @@ func isMovePossible(head *Coord, board *Board, move string) bool {
 	return true
 }
 
+/*
+returns valid move if we win a head-to-head, else returns a move that avoids it
+*/
+func detectHeadToHead(us *Coord, board *Board, moves []string) string {
+
+}
+
 // HandleIndex is called when your Battlesnake is created and refreshed
 // by play.battlesnake.com. BattlesnakeInfoResponse contains information about
 // your Battlesnake, including what it should look like on the game board.
@@ -157,7 +165,10 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		legalMoves = append(legalMoves, "right")
 	}
 
-	// find closest food and path to it if possible
+	// if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
+	move := "null"
+
+	// else, find closest food and path to it if possible
 	dist := 90000 // TODO: change this to actual max value of int, lookup golang spec
 	food := request.Board.Food
 	var closestFood Coord
@@ -170,7 +181,6 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 
 	// attempt to go in the direction of the closestFood
 	var dx, dy int = closestFood.X - head.X, closestFood.Y - head.Y
-	move := "null"
 	if dx > 0 && isMovePossible(&head, &request.Board, "right") {
 		move = "right"
 	} else if dx < 0 && isMovePossible(&head, &request.Board, "left") {
