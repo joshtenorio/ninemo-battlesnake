@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 )
@@ -108,11 +107,10 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	var xHead int = request.You.Head.X
 	var yHead int = request.You.Head.Y
 
-	// Choose a random direction to move in
+	// declare list of legal moves
 	legalMoves := []string{"up", "down", "left", "right"}
 
-	// TODO: get parts of our snake that is adjacent to head so we can not run into ourself
-	// eliminate moves from possibleMoves
+	// eliminate illegal moves
 	var (
 		endUp    = Coord{xHead, yHead + 1}
 		endDown  = Coord{xHead, yHead - 1}
@@ -120,10 +118,10 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		endRight = Coord{xHead + 1, yHead}
 	)
 
+	// eliminate moves that result in colliding with self
 	body := request.You.Body
 	for i := 0; i < len(body); i++ {
 		coord := body[i]
-		fmt.Printf("(%d, %d)\n", coord.X, coord.Y)
 		if coord.X == endUp.X && coord.Y == endUp.Y {
 			legalMoves[0] = "null"
 			fmt.Printf("body is above head\n")
@@ -139,53 +137,44 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// eliminate moves  that result in colliding with wall
 	for i := 0; i < len(legalMoves); i++ {
-		fmt.Printf("%s is a legal move\n", legalMoves[i])
-	}
-	// select a legal move that isn't null
-	move := legalMoves[rand.Intn(len(legalMoves))]
-	for move == "null" {
-		move = legalMoves[rand.Intn(len(legalMoves))]
-
-		// make sure we aren't running into a wall
-		switch move {
-		case "up":
-			// if we are hitting the upper wall
-			if yHead+1 >= yMax {
-				legalMoves[0] = "null" // set up to null
-				move = "null"
-			}
-		case "down":
-			// if we are hitting the lower wall
-			if yHead-1 < yMin {
-				legalMoves[1] = "null" // set down to null
-				move = "null"
-				for i := 0; i < len(legalMoves); i++ {
-					fmt.Printf("%s is a legal move\n", legalMoves[i])
+		if legalMoves[i] != "null" {
+			switch legalMoves[i] {
+			case "up":
+				if endUp.Y >= yMax {
+					legalMoves[i] = "null"
 				}
-			}
-		case "left":
-			// if we are hitting the left wall
-			if xHead-1 < xMin {
-				legalMoves[2] = "null" // set left to null
-				move = "null"
-			}
-		case "right":
-			// if we are hitting the right wall
-			if xHead+1 >= xMax {
-				legalMoves[3] = "null" // set right to null
-				move = "null"
-			}
-		default:
-			// do nothing, proceed as normal
+			case "down":
+				if endDown.Y < yMin {
+					legalMoves[i] = "null"
+				}
+			case "left":
+				if endLeft.X < xMin {
+					legalMoves[i] = "null"
+				}
+			case "right":
+				if endRight.X >= xMax {
+					legalMoves[i] = "null"
+				}
+			} // end switch
+		}
+	} // end for
+
+	// select a legal move that isn't null
+	//move := legalMoves[rand.Intn(len(legalMoves))]
+	// pick the first move that isn't null
+	move := "null"
+	for i := 0; i < len(legalMoves); i++ {
+		if legalMoves[i] != "null" {
+			move = legalMoves[i]
 		}
 	}
-
 	response := MoveResponse{
 		Move: move,
 	}
 
-	fmt.Printf("CHOSEN MOVE: %s\n", response.Move)
+	fmt.Printf("CHOSEN MOVE: %s\n\n", response.Move)
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
