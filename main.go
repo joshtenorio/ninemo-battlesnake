@@ -181,8 +181,23 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 			} else if coord.X == endRight.X && coord.Y == endRight.Y {
 				legalMoves[3] = "null"
 			}
+		} // end inner for
+	} // end outer for
+
+	// find closest food and path to it if possible
+	dist := 90000 // TODO: change this to actual max value of int, lookup golang spec
+	food := request.Board.Food
+	var closestFood Coord
+	for i := 0; i < len(food); i++ {
+		if (food[i].X-xHead)*(food[i].X-xHead)+(food[i].Y-yHead)*(food[i].Y-yHead) < dist {
+			dist = (food[i].X-xHead)*(food[i].X-xHead) + (food[i].Y-yHead)*(food[i].Y-yHead)
+			closestFood = food[i]
 		}
 	}
+
+	// attempt to go in the direction of the closestFood
+	var dx, dy int = closestFood.X - xHead, closestFood.Y - yHead
+
 	// pick the first move that isn't null
 	move := "null"
 	for i := 0; i < len(legalMoves); i++ {
