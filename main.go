@@ -189,26 +189,30 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 	if ourLength <= enemyLength {
 		fmt.Printf("in h2h: we lose so avoid\n")
 		// pick something that avoids them because we'll lose
-		for i := 0; i < len(movesEnemy); i++ {
+		for i := 0; i < len(movesUs); i++ {
 			futureUs := movesUs[i]
-			futureEnemy := movesEnemy[i]
-			if (futureUs.X != futureEnemy.X || futureUs.Y != futureEnemy.Y) && isMovePossible(us, board, indexToMove(i)) {
-				return indexToMove(i)
-			}
-		}
+			for j := 0; j < len(movesEnemy); j++ {
+				futureEnemy := movesEnemy[i]
+				if (futureUs.X != futureEnemy.X || futureUs.Y != futureEnemy.Y) && isMovePossible(us, board, indexToMove(i)) {
+					return indexToMove(i)
+				}
+			} // end for j
+		} // end for i
 	} else if ourLength > enemyLength {
 		fmt.Printf("in h2h: we win so attempt\n")
 		// pick the move that results in h2h collision
 		// TODO: if there are two possible squares for a collision and there is food in one of them, go for the one w/ food
-		for i := 0; i < len(movesEnemy); i++ {
+		for i := 0; i < len(movesUs); i++ {
 			futureUs := movesUs[i]
-			futureEnemy := movesEnemy[i]
-			fmt.Printf("us: (%d, %d)\tenemy: (%d, %d)\n", futureUs.X, futureUs.Y, futureEnemy.X, futureEnemy.Y)
-			if futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y {
-				fmt.Printf("deciding to move: %s\n", indexToMove(i))
-				return indexToMove(i)
-			}
-		}
+			for j := 0; j < len(movesEnemy); j++ {
+				futureEnemy := movesEnemy[j]
+				fmt.Printf("us: (%d, %d)\tenemy: (%d, %d)\n", futureUs.X, futureUs.Y, futureEnemy.X, futureEnemy.Y)
+				if futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y {
+					fmt.Printf("deciding to move: %s\n", indexToMove(i))
+					return indexToMove(i)
+				}
+			} // end for j
+		} // end for i
 	}
 	return "null"
 }
