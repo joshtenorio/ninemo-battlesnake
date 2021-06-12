@@ -103,6 +103,26 @@ func moveToCoord(move string, position *Coord) Coord {
 }
 
 /*
+checks if pos is blocking
+*/
+func isBlocking(board *Board, pos Coord) bool {
+	// check if snake
+	for i := 0; i < len(board.Snakes); i++ {
+		head := board.Snakes[i].Head
+		if head.X == pos.X && head.Y == pos.Y {
+			return true
+		}
+		for j := 0; j < len(board.Snakes[i].Body); j++ {
+			if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+/*
 returns true if move is possible, false if otherwise
 doesn't take into consideration head to head collisions
 */
@@ -170,9 +190,14 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 	for i := 0; i < len(heads); i++ {
 		distSquared := (heads[i].X-us.X)*(heads[i].X-us.X) + (heads[i].Y-us.Y)*(heads[i].Y-us.Y)
 		if distSquared == 2 || distSquared == 4 {
-			enemyHead = heads[i]
-			enemyLength = lengths[i]
-			break
+			if distSquared == 4 && isBlocking(board, Coord{(us.X + heads[i].X) / 2, (us.Y + heads[i].Y) / 2}) { // special case for d^2=4: make sure there isn't a body between us
+				continue
+			} else {
+				enemyHead = heads[i]
+				enemyLength = lengths[i]
+				break
+			}
+
 		}
 	} // end for loop
 
@@ -206,9 +231,7 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 			futureUs := movesUs[i]
 			for j := 0; j < len(movesEnemy); j++ {
 				futureEnemy := movesEnemy[j]
-				fmt.Printf("us: (%d, %d)\tenemy: (%d, %d)\n", futureUs.X, futureUs.Y, futureEnemy.X, futureEnemy.Y)
 				if futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y {
-					fmt.Printf("deciding to move: %s\n", indexToMove(i))
 					return indexToMove(i)
 				}
 			} // end for j
@@ -277,7 +300,6 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	// if there is a potential head to head, go for it if we can win, else avoid
 	move := "null"
 	move = detectHeadToHead(&head, &request.Board, request.You.Length, legalMoves)
-	fmt.Printf("move after h2h check: %s\n", move)
 	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
 	//if move == "null" {
 	// put hazard code in here
