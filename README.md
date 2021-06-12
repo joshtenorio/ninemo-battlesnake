@@ -6,6 +6,6 @@ Go [battlesnake](https://play.battlesnake.com/)
 
 ## Challenges
 - [x] avoid walls
-- [ ] avoid ourselves
+- [x] avoid ourselves
 - [ ] avoid other snakes
 - [ ] find food

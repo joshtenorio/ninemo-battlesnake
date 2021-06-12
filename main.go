@@ -161,8 +161,14 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		}
 	} // end for
 
-	// select a legal move that isn't null
-	//move := legalMoves[rand.Intn(len(legalMoves))]
+	// eliminate moves that result in colliding with other snake bodies
+	// we are not eliminating moves that result in colliding with other heads yet
+	/**
+	  pseudo code
+	  for each snake
+	  for each coord in snake's body
+	  if coord is equal to any of our possible moves, eliminate that move
+	*/
 	// pick the first move that isn't null
 	move := "null"
 	for i := 0; i < len(legalMoves); i++ {
