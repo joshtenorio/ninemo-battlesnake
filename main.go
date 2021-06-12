@@ -203,6 +203,7 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 		for i := 0; i < len(movesEnemy); i++ {
 			futureUs := movesUs[i]
 			futureEnemy := movesEnemy[i]
+			fmt.Printf("us: (%d, %d)\tenemy: (%d, %d)\n", futureUs.X, futureUs.Y, futureEnemy.X, futureEnemy.Y)
 			if futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y {
 				fmt.Printf("deciding to move: %s\n", indexToMove(i))
 				return indexToMove(i)
@@ -274,9 +275,10 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	move = detectHeadToHead(&head, &request.Board, request.You.Length, legalMoves)
 	fmt.Printf("move after h2h check: %s\n", move)
 	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
-	if move == "null" {
-		// put hazard code in here
-	}
+	//if move == "null" {
+	// put hazard code in here
+	//}
+
 	// else, find closest food and path to it if possible
 	if move == "null" {
 		dist := 90000 // TODO: change this to actual max value of int, lookup golang spec
