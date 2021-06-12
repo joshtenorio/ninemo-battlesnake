@@ -99,8 +99,6 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	
-
 	// get board size and current position of our head
 	// board size info is in here and not HandleStart in case we are playing two different games at once with different board sizes
 	var xMin, yMin int = 0, 0
@@ -110,74 +108,97 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	var xHead int = request.You.Head.X
 	var yHead int = request.You.Head.Y
 
-	
-
 	// Choose a random direction to move in
 	legalMoves := []string{"up", "down", "left", "right"}
 
 	// TODO: get parts of our snake that is adjacent to head so we can not run into ourself
 	// eliminate moves from possibleMoves
 	var (
-		endUp = Coord{xHead, yHead + 1}
-		endDown = Coord{xHead, yHead - 1}
-		endLeft = Coord{xHead - 1, yHead}
+		endUp    = Coord{xHead, yHead + 1}
+		endDown  = Coord{xHead, yHead - 1}
+		endLeft  = Coord{xHead - 1, yHead}
 		endRight = Coord{xHead + 1, yHead}
 	)
 
-
 	body := request.You.Body
-	for j := 0; j < len(body); j++ {
-		coord := body[j]
-		// TODO: could this be a switch statement?
-		// FIXME: this will run into issues
+	for i := 0; i < len(body); i++ {
+		coord := body[i]
+		fmt.Printf("(%d, %d)\n", coord.X, coord.Y)
 		if coord.X == endUp.X && coord.Y == endUp.Y {
 			legalMoves[0] = "null"
+			fmt.Printf("body is above head\n")
 		} else if coord.X == endDown.X && coord.Y == endDown.Y {
 			legalMoves[1] = "null"
+			fmt.Printf("body is below head\n")
 		} else if coord.X == endLeft.X && coord.Y == endLeft.Y {
 			legalMoves[2] = "null"
+			fmt.Printf("body is left of head\n")
 		} else if coord.X == endRight.X && coord.Y == endRight.Y {
 			legalMoves[3] = "null"
+			fmt.Printf("body is right of head\n")
 		}
 	}
-	
+
+	for i := 0; i < len(legalMoves); i++ {
+		fmt.Printf("%s is a legal move\n", legalMoves[i])
+	}
 	// select a legal move that isn't null
 	move := legalMoves[rand.Intn(len(legalMoves))]
-	for move != "null" {
+	for move == "null" {
 		move = legalMoves[rand.Intn(len(legalMoves))]
 	}
 	fmt.Printf("INITIAL MOVE: %s\n", move)
 
 	// make sure we aren't running into a wall
-	// TODO: put this in a loop in case we are in a corner
+	// TODO: move this above
 	switch move {
 	case "up":
-		// if we are hitting the upper wall and towards the left, move right
-		if yHead + 1 >= yMax && xHead < xMax / 2 {
-			move = "right"
-		} else if yHead + 1 >= yMax {
-			move = "left"
+		// if we are hitting the upper wall
+		if yHead+1 >= yMax {
+			legalMoves[0] = "null" // set up to null
+			for i := 0; i < len(legalMoves); i++ {
+				fmt.Printf("%s is a legal move\n", legalMoves[i])
+			}
+			move := legalMoves[rand.Intn(len(legalMoves))]
+			for move == "null" {
+				move = legalMoves[rand.Intn(len(legalMoves))]
+			}
 		}
 	case "down":
-		// if we are hitting the lower wall and towards the left, move right
-		if yHead - 1 < yMin && xHead < xMax / 2 {
-			move = "right"
-		} else if yHead - 1 < yMin {
-			move = "left"
+		// if we are hitting the lower wall
+		if yHead-1 < yMin {
+			legalMoves[1] = "null" // set down to null
+			for i := 0; i < len(legalMoves); i++ {
+				fmt.Printf("%s is a legal move\n", legalMoves[i])
+			}
+			move := legalMoves[rand.Intn(len(legalMoves))]
+			for move == "null" {
+				move = legalMoves[rand.Intn(len(legalMoves))]
+			}
 		}
 	case "left":
-		// if we are hitting the left wall and downwards, move up
-		if xHead - 1 < xMin && yHead < yMax / 2 {
-			move = "up"
-		} else if xHead - 1 < xMin {
-			move = "down"
+		// if we are hitting the left wall
+		if xHead-1 < xMin {
+			legalMoves[2] = "null" // set left to null
+			for i := 0; i < len(legalMoves); i++ {
+				fmt.Printf("%s is a legal move\n", legalMoves[i])
+			}
+			move := legalMoves[rand.Intn(len(legalMoves))]
+			for move == "null" {
+				move = legalMoves[rand.Intn(len(legalMoves))]
+			}
 		}
 	case "right":
-		// if we are hitting the right wall and downwards, move up
-		if xHead + 1 >= xMax && yHead < yMax / 2 {
-			move = "up"
-		} else if xHead + 1 >= xMax {
-			move = "down"
+		// if we are hitting the right wall
+		if xHead+1 >= xMax {
+			legalMoves[3] = "null" // set right to null
+			for i := 0; i < len(legalMoves); i++ {
+				fmt.Printf("%s is a legal move\n", legalMoves[i])
+			}
+			move := legalMoves[rand.Intn(len(legalMoves))]
+			for move == "null" {
+				move = legalMoves[rand.Intn(len(legalMoves))]
+			}
 		}
 	default:
 		// do nothing, proceed as normal
