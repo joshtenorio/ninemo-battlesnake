@@ -8,4 +8,5 @@ Go [battlesnake](https://play.battlesnake.com/)
 - [x] avoid walls
 - [x] avoid ourselves
 - [x] avoid other snakes
-- [ ] find food
+- [x] find food
+- [ ] avoid traps
