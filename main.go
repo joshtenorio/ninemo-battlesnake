@@ -110,7 +110,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	// declare list of legal moves
 	legalMoves := []string{"up", "down", "left", "right"}
 
-	// eliminate illegal moves
+	// declare possible end coords
 	var (
 		endUp    = Coord{xHead, yHead + 1}
 		endDown  = Coord{xHead, yHead - 1}
@@ -124,16 +124,12 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		coord := body[i]
 		if coord.X == endUp.X && coord.Y == endUp.Y {
 			legalMoves[0] = "null"
-			fmt.Printf("body is above head\n")
 		} else if coord.X == endDown.X && coord.Y == endDown.Y {
 			legalMoves[1] = "null"
-			fmt.Printf("body is below head\n")
 		} else if coord.X == endLeft.X && coord.Y == endLeft.Y {
 			legalMoves[2] = "null"
-			fmt.Printf("body is left of head\n")
 		} else if coord.X == endRight.X && coord.Y == endRight.Y {
 			legalMoves[3] = "null"
-			fmt.Printf("body is right of head\n")
 		}
 	}
 
@@ -161,14 +157,32 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		}
 	} // end for
 
-	// eliminate moves that result in colliding with other snake bodies
-	// we are not eliminating moves that result in colliding with other heads yet
-	/**
-	  pseudo code
-	  for each snake
-	  for each coord in snake's body
-	  if coord is equal to any of our possible moves, eliminate that move
-	*/
+	// eliminate moves that result in colliding with other snake heads and bodies
+	for i := 0; i < len(request.Board.Snakes); i++ {
+		head := request.Board.Snakes[i].Head
+		if head.X == endUp.X && head.Y == endUp.Y {
+			legalMoves[0] = "null"
+		} else if head.X == endDown.X && head.Y == endDown.Y {
+			legalMoves[1] = "null"
+		} else if head.X == endLeft.X && head.Y == endLeft.Y {
+			legalMoves[2] = "null"
+		} else if head.X == endRight.X && head.Y == endRight.Y {
+			legalMoves[3] = "null"
+		}
+		// deal with head of snake
+		for j := 0; j < len(request.Board.Snakes[i].Body); j++ {
+			coord := request.Board.Snakes[i].Body[j]
+			if coord.X == endUp.X && coord.Y == endUp.Y {
+				legalMoves[0] = "null"
+			} else if coord.X == endDown.X && coord.Y == endDown.Y {
+				legalMoves[1] = "null"
+			} else if coord.X == endLeft.X && coord.Y == endLeft.Y {
+				legalMoves[2] = "null"
+			} else if coord.X == endRight.X && coord.Y == endRight.Y {
+				legalMoves[3] = "null"
+			}
+		}
+	}
 	// pick the first move that isn't null
 	move := "null"
 	for i := 0; i < len(legalMoves); i++ {
