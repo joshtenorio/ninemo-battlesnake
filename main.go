@@ -156,10 +156,11 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		// if we are hitting the upper wall
 		if yHead+1 >= yMax {
 			legalMoves[0] = "null" // set up to null
+			move = "null"
 			for i := 0; i < len(legalMoves); i++ {
 				fmt.Printf("%s is a legal move\n", legalMoves[i])
 			}
-			move := legalMoves[rand.Intn(len(legalMoves))]
+			move = legalMoves[rand.Intn(len(legalMoves))]
 			for move == "null" {
 				move = legalMoves[rand.Intn(len(legalMoves))]
 			}
@@ -168,22 +169,25 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		// if we are hitting the lower wall
 		if yHead-1 < yMin {
 			legalMoves[1] = "null" // set down to null
+			move = "null"
 			for i := 0; i < len(legalMoves); i++ {
 				fmt.Printf("%s is a legal move\n", legalMoves[i])
 			}
-			move := legalMoves[rand.Intn(len(legalMoves))]
+			move = legalMoves[rand.Intn(len(legalMoves))]
 			for move == "null" {
 				move = legalMoves[rand.Intn(len(legalMoves))]
+				fmt.Printf("checking move %s\n", move)
 			}
 		}
 	case "left":
 		// if we are hitting the left wall
 		if xHead-1 < xMin {
 			legalMoves[2] = "null" // set left to null
+			move = "null"
 			for i := 0; i < len(legalMoves); i++ {
 				fmt.Printf("%s is a legal move\n", legalMoves[i])
 			}
-			move := legalMoves[rand.Intn(len(legalMoves))]
+			move = legalMoves[rand.Intn(len(legalMoves))]
 			for move == "null" {
 				move = legalMoves[rand.Intn(len(legalMoves))]
 			}
@@ -192,10 +196,11 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		// if we are hitting the right wall
 		if xHead+1 >= xMax {
 			legalMoves[3] = "null" // set right to null
+			move = "null"
 			for i := 0; i < len(legalMoves); i++ {
 				fmt.Printf("%s is a legal move\n", legalMoves[i])
 			}
-			move := legalMoves[rand.Intn(len(legalMoves))]
+			move = legalMoves[rand.Intn(len(legalMoves))]
 			for move == "null" {
 				move = legalMoves[rand.Intn(len(legalMoves))]
 			}
