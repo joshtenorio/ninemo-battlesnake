@@ -183,7 +183,6 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 
 	// before continuing, determine all possible moves since we need it for both cases
 	movesUs := []Coord{{us.X, us.Y + 1}, {us.X, us.Y - 1}, {us.X - 1, us.Y}, {us.X + 1, us.Y}}
-
 	movesEnemy := []Coord{{enemyHead.X, enemyHead.Y + 1}, {enemyHead.X, enemyHead.Y - 1}, {enemyHead.X - 1, enemyHead.Y}, {enemyHead.X + 1, enemyHead.Y}}
 
 	// determine if we can beat them
@@ -192,7 +191,7 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 		for i := 0; i < len(movesEnemy); i++ {
 			future := movesUs[i]
 			enemy := movesEnemy[i]
-			if (future.X != enemy.X || future.Y != enemy.Y) && isMovePossible(&future, board, indexToMove(i)) {
+			if (future.X != enemy.X || future.Y != enemy.Y) && isMovePossible(us, board, indexToMove(i)) {
 				return indexToMove(i)
 			}
 		}
