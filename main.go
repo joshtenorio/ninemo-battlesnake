@@ -113,11 +113,39 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	
 
 	// Choose a random direction to move in
-	possibleMoves := []string{"up", "down", "left", "right"}
+	legalMoves := []string{"up", "down", "left", "right"}
 
 	// TODO: get parts of our snake that is adjacent to head so we can not run into ourself
 	// eliminate moves from possibleMoves
-	move := possibleMoves[rand.Intn(len(possibleMoves))]
+	var (
+		endUp = Coord{xHead, yHead + 1}
+		endDown = Coord{xHead, yHead - 1}
+		endLeft = Coord{xHead - 1, yHead}
+		endRight = Coord{xHead + 1, yHead}
+	)
+
+
+	body := request.You.Body
+	for j := 0; j < len(body); j++ {
+		coord := body[j]
+		// TODO: could this be a switch statement?
+		// FIXME: this will run into issues
+		if coord.X == endUp.X && coord.Y == endUp.Y {
+			legalMoves[0] = "null"
+		} else if coord.X == endDown.X && coord.Y == endDown.Y {
+			legalMoves[1] = "null"
+		} else if coord.X == endLeft.X && coord.Y == endLeft.Y {
+			legalMoves[2] = "null"
+		} else if coord.X == endRight.X && coord.Y == endRight.Y {
+			legalMoves[3] = "null"
+		}
+	}
+	
+	// select a legal move that isn't null
+	move := legalMoves[rand.Intn(len(legalMoves))]
+	for move != "null" {
+		move = legalMoves[rand.Intn(len(legalMoves))]
+	}
 	fmt.Printf("INITIAL MOVE: %s\n", move)
 
 	// make sure we aren't running into a wall
