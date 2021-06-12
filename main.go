@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 )
@@ -134,7 +135,6 @@ func HandleStart(w http.ResponseWriter, r *http.Request) {
 
 // HandleMove is called for each turn of each game.
 // Valid responses are "up", "down", "left", or "right".
-// TODO: Use the information in the GameRequest object to determine your next move.
 func HandleMove(w http.ResponseWriter, r *http.Request) {
 	request := GameRequest{}
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -142,37 +142,51 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
+	// define our head
+	head := request.You.Head
+
 	// define list of legal moves
 	var legalMoves []string
-	if isMovePossible(&request.You.Head, &request.Board, "up") {
+	if isMovePossible(&head, &request.Board, "up") {
 		legalMoves = append(legalMoves, "up")
-	} else if isMovePossible(&request.You.Head, &request.Board, "down") {
+	} else if isMovePossible(&head, &request.Board, "down") {
 		legalMoves = append(legalMoves, "down")
-	} else if isMovePossible(&request.You.Head, &request.Board, "left") {
+	} else if isMovePossible(&head, &request.Board, "left") {
 		legalMoves = append(legalMoves, "left")
-	} else if isMovePossible(&request.You.Head, &request.Board, "right") {
+	} else if isMovePossible(&head, &request.Board, "right") {
 		legalMoves = append(legalMoves, "right")
 	}
-	// define our head
-	var xHead int = request.You.Head.X
-	var yHead int = request.You.Head.Y
 
 	// find closest food and path to it if possible
 	dist := 90000 // TODO: change this to actual max value of int, lookup golang spec
 	food := request.Board.Food
 	var closestFood Coord
 	for i := 0; i < len(food); i++ {
-		if (food[i].X-xHead)*(food[i].X-xHead)+(food[i].Y-yHead)*(food[i].Y-yHead) < dist {
-			dist = (food[i].X-xHead)*(food[i].X-xHead) + (food[i].Y-yHead)*(food[i].Y-yHead)
+		if (food[i].X-head.X)*(food[i].X-head.X)+(food[i].Y-head.Y)*(food[i].Y-head.Y) < dist {
+			dist = (food[i].X-head.X)*(food[i].X-head.X) + (food[i].Y-head.Y)*(food[i].Y-head.Y)
 			closestFood = food[i]
 		}
 	}
 
 	// attempt to go in the direction of the closestFood
-	var dx, dy int = closestFood.X - xHead, closestFood.Y - yHead
+	var dx, dy int = closestFood.X - head.X, closestFood.Y - head.Y
+	move := "null"
+	if dx > 0 && isMovePossible(&head, &request.Board, "right") {
+		move = "right"
+	} else if dx < 0 && isMovePossible(&head, &request.Board, "left") {
+		move = "left"
+	} else if dy > 0 && isMovePossible(&head, &request.Board, "up") {
+		move = "up"
+	} else if dy < 0 && isMovePossible(&head, &request.Board, "down") {
+		move = "down"
+	}
 
 	// if we can't go in direction of closest food, just pick a random move
+	if move == "null" {
+		move = legalMoves[rand.Intn(len(legalMoves))]
+	}
 
+	// set up response
 	response := MoveResponse{
 		Move: move,
 	}
