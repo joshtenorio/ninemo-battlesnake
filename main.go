@@ -55,6 +55,32 @@ type MoveResponse struct {
 	Shout string `json:"shout,omitempty"`
 }
 
+// returns true if direction is possible, false if otherwise
+func isPossible(head *Coord, board *Board, move string) bool {
+	// calculate end position for move
+	var position Coord
+	switch move {
+	case "up":
+		position.X = head.X
+		position.Y = head.Y + 1
+	case "down":
+		position.X = head.X
+		position.Y = head.Y - 1
+	case "left":
+		position.X = head.X - 1
+		position.Y = head.Y
+	case "right":
+		position.X = head.X + 1
+		position.Y = head.Y
+	}
+
+	// check if move collides with ourself
+
+	// check if move collides with wall
+	// check if move collides with other snakes
+	return true
+}
+
 // HandleIndex is called when your Battlesnake is created and refreshed
 // by play.battlesnake.com. BattlesnakeInfoResponse contains information about
 // your Battlesnake, including what it should look like on the game board.

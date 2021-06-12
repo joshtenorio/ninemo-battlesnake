@@ -7,5 +7,5 @@ Go [battlesnake](https://play.battlesnake.com/)
 ## Challenges
 - [x] avoid walls
 - [x] avoid ourselves
-- [ ] avoid other snakes
+- [x] avoid other snakes
 - [ ] find food
