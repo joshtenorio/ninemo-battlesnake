@@ -197,13 +197,14 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 			}
 		}
 	} else if ourLength > enemyLength {
-		fmt.Print("in h2h: we win so attempt")
+		fmt.Printf("in h2h: we win so attempt\n")
 		// pick the move that results in h2h collision
 		// TODO: if there are two possible squares for a collision and there is food in one of them, go for the one w/ food
 		for i := 0; i < len(movesEnemy); i++ {
 			futureUs := movesUs[i]
 			futureEnemy := movesEnemy[i]
 			if futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y {
+				fmt.Printf("deciding to move: %s\n", indexToMove(i))
 				return indexToMove(i)
 			}
 		}
