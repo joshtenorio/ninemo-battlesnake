@@ -55,8 +55,11 @@ type MoveResponse struct {
 	Shout string `json:"shout,omitempty"`
 }
 
-// returns true if direction is possible, false if otherwise
-func isPossible(head *Coord, board *Board, move string) bool {
+/*
+returns true if move is possible, false if otherwise
+doesn't take into consideration head to head collisions
+*/
+func isMovePossible(head *Coord, board *Board, move string) bool {
 	// calculate end position for move
 	var position Coord
 	switch move {
@@ -74,10 +77,25 @@ func isPossible(head *Coord, board *Board, move string) bool {
 		position.Y = head.Y
 	}
 
-	// check if move collides with ourself
-
 	// check if move collides with wall
+	xMax, yMax := board.Width, board.Height
+	if position.X >= xMax || position.X < 0 || position.Y >= yMax || position.Y < 0 {
+		return false
+	}
+
 	// check if move collides with other snakes
+	for i := 0; i < len(board.Snakes); i++ {
+		coord := board.Snakes[i].Head
+		if position.X == coord.X && position.Y == coord.Y {
+			return false
+		}
+		for j := 0; j < len(board.Snakes[i].Body); j++ {
+			coord = board.Snakes[i].Body[j]
+			if position.X == coord.X && position.Y == coord.Y {
+				return false
+			}
+		} // end inner for
+	} // end outer for
 	return true
 }
 
@@ -124,76 +142,20 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	// get board size and current position of our head
-	// board size info is in here and not HandleStart in case we are playing two different games at once with different board sizes
-	var xMin, yMin int = 0, 0
-	var xMax int = request.Board.Width
-	var yMax int = request.Board.Height
-
+	// define list of legal moves
+	var legalMoves []string
+	if isMovePossible(&request.You.Head, &request.Board, "up") {
+		legalMoves = append(legalMoves, "up")
+	} else if isMovePossible(&request.You.Head, &request.Board, "down") {
+		legalMoves = append(legalMoves, "down")
+	} else if isMovePossible(&request.You.Head, &request.Board, "left") {
+		legalMoves = append(legalMoves, "left")
+	} else if isMovePossible(&request.You.Head, &request.Board, "right") {
+		legalMoves = append(legalMoves, "right")
+	}
+	// define our head
 	var xHead int = request.You.Head.X
 	var yHead int = request.You.Head.Y
-
-	// declare list of legal moves
-	legalMoves := []string{"up", "down", "left", "right"}
-
-	// declare possible end coords
-	var (
-		endUp    = Coord{xHead, yHead + 1}
-		endDown  = Coord{xHead, yHead - 1}
-		endLeft  = Coord{xHead - 1, yHead}
-		endRight = Coord{xHead + 1, yHead}
-	)
-
-	// eliminate moves  that result in colliding with wall
-	for i := 0; i < len(legalMoves); i++ {
-		if legalMoves[i] != "null" {
-			switch legalMoves[i] {
-			case "up":
-				if endUp.Y >= yMax {
-					legalMoves[i] = "null"
-				}
-			case "down":
-				if endDown.Y < yMin {
-					legalMoves[i] = "null"
-				}
-			case "left":
-				if endLeft.X < xMin {
-					legalMoves[i] = "null"
-				}
-			case "right":
-				if endRight.X >= xMax {
-					legalMoves[i] = "null"
-				}
-			} // end switch
-		}
-	} // end for
-
-	// eliminate moves that result in colliding with other snake heads and bodies
-	for i := 0; i < len(request.Board.Snakes); i++ {
-		head := request.Board.Snakes[i].Head
-		if head.X == endUp.X && head.Y == endUp.Y {
-			legalMoves[0] = "null"
-		} else if head.X == endDown.X && head.Y == endDown.Y {
-			legalMoves[1] = "null"
-		} else if head.X == endLeft.X && head.Y == endLeft.Y {
-			legalMoves[2] = "null"
-		} else if head.X == endRight.X && head.Y == endRight.Y {
-			legalMoves[3] = "null"
-		}
-		// deal with head of snake
-		for j := 0; j < len(request.Board.Snakes[i].Body); j++ {
-			coord := request.Board.Snakes[i].Body[j]
-			if coord.X == endUp.X && coord.Y == endUp.Y {
-				legalMoves[0] = "null"
-			} else if coord.X == endDown.X && coord.Y == endDown.Y {
-				legalMoves[1] = "null"
-			} else if coord.X == endLeft.X && coord.Y == endLeft.Y {
-				legalMoves[2] = "null"
-			} else if coord.X == endRight.X && coord.Y == endRight.Y {
-				legalMoves[3] = "null"
-			}
-		} // end inner for
-	} // end outer for
 
 	// find closest food and path to it if possible
 	dist := 90000 // TODO: change this to actual max value of int, lookup golang spec
@@ -209,13 +171,8 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	// attempt to go in the direction of the closestFood
 	var dx, dy int = closestFood.X - xHead, closestFood.Y - yHead
 
-	// pick the first move that isn't null
-	move := "null"
-	for i := 0; i < len(legalMoves); i++ {
-		if legalMoves[i] != "null" {
-			move = legalMoves[i]
-		}
-	}
+	// if we can't go in direction of closest food, just pick a random move
+
 	response := MoveResponse{
 		Move: move,
 	}
