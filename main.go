@@ -58,6 +58,29 @@ type MoveResponse struct {
 }
 
 /*
+returns move corresponding to index
+0: up
+1: down
+2: left
+3: right
+default: null
+*/
+func indexToMove(num int) string {
+	switch num {
+	case 0:
+		return "up"
+	case 1:
+		return "down"
+	case 2:
+		return "left"
+	case 3:
+		return "right"
+	default:
+		return "null"
+	}
+}
+
+/*
 returns true if move is possible, false if otherwise
 doesn't take into consideration head to head collisions
 */
@@ -105,9 +128,61 @@ func isMovePossible(head *Coord, board *Board, move string) bool {
 returns valid move if we win a head-to-head, else returns a move that avoids it
 if there is no head-to-head, return null
 */
-func detectHeadToHead(us *Coord, board *Board, validMoves []string) string {
+func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []string) string {
 	// get list of heads that are close to us (not including ourself)
+	var heads []Coord
+	var lengths []int32
+	snakes := board.Snakes
+	for i := 0; i < len(snakes); i++ {
+		if snakes[i].Head.X != us.X || snakes[i].Head.Y != us.Y {
+			heads = append(heads, snakes[i].Head)
+			lengths = append(lengths, snakes[i].Length)
+		}
+	}
 
+	// iterate through all the heads, if d^2 is == 2 or 4 then there is a possibility of h2h
+	// find first head that matches the above condition
+	// limitation: only considers one possible h2h at a time - if there are >1 possible h2h i only consider one for now
+	var enemyHead = Coord{-1, -1}
+	var enemyLength int32
+	for i := 0; i < len(heads); i++ {
+		distSquared := (heads[i].X-us.X)*(heads[i].X-us.X) + (heads[i].Y-us.Y)*(heads[i].Y-us.Y)
+		if distSquared == 2 || distSquared == 4 {
+			enemyHead = heads[i]
+			enemyLength = lengths[i]
+			break
+		}
+	} // end for loop
+
+	// if enemyhead is -1 return null because there is no h2h collision possible
+	if enemyHead.X == -1 {
+		return "null"
+	}
+
+	// before continuing, determine all possible moves since we need it for both cases
+	movesUs := []Coord{{us.X, us.Y + 1}, {us.X, us.Y - 1}, {us.X - 1, us.Y}, {us.X + 1, us.Y}}
+	movesEnemy := []Coord{{enemyHead.X, enemyHead.Y + 1}, {enemyHead.X, enemyHead.Y - 1}, {enemyHead.X - 1, enemyHead.Y}, {enemyHead.X + 1, enemyHead.Y}}
+
+	// determine if we can beat them
+	if ourLength <= enemyLength {
+		// pick something that avoids them because we'll lose
+		for i := 0; i < len(movesUs); i++ {
+			us := movesUs[i]
+			enemy := movesEnemy[i]
+			if us.X != enemy.X || us.Y != enemy.Y {
+				return indexToMove(i)
+			}
+		}
+	} else if ourLength > enemyLength {
+		// pick the move that results in h2h collision
+		for i := 0; i < len(movesEnemy); i++ {
+			us := movesUs[i]
+			enemy := movesEnemy[i]
+			if us.X == enemy.X && us.Y == enemy.Y {
+				return indexToMove(i)
+			}
+		}
+	}
 	return "null"
 }
 
@@ -170,7 +245,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 
 	// if there is a potential head to head, go for it if we can win, else avoid
 	move := "null"
-	move = detectHeadToHead(&head, &request.Board, legalMoves)
+	move = detectHeadToHead(&head, &request.Board, request.You.Length, legalMoves)
 
 	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
 	if move == "null" {
