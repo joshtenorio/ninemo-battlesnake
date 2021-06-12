@@ -144,21 +144,6 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		endRight = Coord{xHead + 1, yHead}
 	)
 
-	// eliminate moves that result in colliding with self
-	body := request.You.Body
-	for i := 0; i < len(body); i++ {
-		coord := body[i]
-		if coord.X == endUp.X && coord.Y == endUp.Y {
-			legalMoves[0] = "null"
-		} else if coord.X == endDown.X && coord.Y == endDown.Y {
-			legalMoves[1] = "null"
-		} else if coord.X == endLeft.X && coord.Y == endLeft.Y {
-			legalMoves[2] = "null"
-		} else if coord.X == endRight.X && coord.Y == endRight.Y {
-			legalMoves[3] = "null"
-		}
-	}
-
 	// eliminate moves  that result in colliding with wall
 	for i := 0; i < len(legalMoves); i++ {
 		if legalMoves[i] != "null" {
