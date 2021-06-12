@@ -156,7 +156,7 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 	var lengths []int32
 	snakes := board.Snakes
 	for i := 0; i < len(snakes); i++ {
-		if snakes[i].Head.X != us.X || snakes[i].Head.Y != us.Y {
+		if snakes[i].Head.X != us.X || snakes[i].Head.Y != us.Y { // don't include ourself in list of snakes
 			heads = append(heads, snakes[i].Head)
 			lengths = append(lengths, snakes[i].Length)
 		}
@@ -187,20 +187,23 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 
 	// determine if we can beat them
 	if ourLength <= enemyLength {
+		fmt.Printf("in h2h: we lose so avoid\n")
 		// pick something that avoids them because we'll lose
 		for i := 0; i < len(movesEnemy); i++ {
-			future := movesUs[i]
-			enemy := movesEnemy[i]
-			if (future.X != enemy.X || future.Y != enemy.Y) && isMovePossible(us, board, indexToMove(i)) {
+			futureUs := movesUs[i]
+			futureEnemy := movesEnemy[i]
+			if (futureUs.X != futureEnemy.X || futureUs.Y != futureEnemy.Y) && isMovePossible(us, board, indexToMove(i)) {
 				return indexToMove(i)
 			}
 		}
 	} else if ourLength > enemyLength {
+		fmt.Print("in h2h: we win so attempt")
 		// pick the move that results in h2h collision
+		// TODO: if there are two possible squares for a collision and there is food in one of them, go for the one w/ food
 		for i := 0; i < len(movesEnemy); i++ {
-			future := movesUs[i]
-			enemy := movesEnemy[i]
-			if future.X == enemy.X && future.Y == enemy.Y {
+			futureUs := movesUs[i]
+			futureEnemy := movesEnemy[i]
+			if futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y {
 				return indexToMove(i)
 			}
 		}
@@ -268,7 +271,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	// if there is a potential head to head, go for it if we can win, else avoid
 	move := "null"
 	move = detectHeadToHead(&head, &request.Board, request.You.Length, legalMoves)
-
+	fmt.Printf("move after h2h check: %s\n", move)
 	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
 	if move == "null" {
 		// put hazard code in here
