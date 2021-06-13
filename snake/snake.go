@@ -33,7 +33,7 @@ func IndexToMove(num int) string {
 given a move and initial position, calculate final position
 */
 func MoveToCoord(move string, position *datatypes.Coord) datatypes.Coord {
-	output := datatypes.Coord{-1, -1}
+	output := datatypes.Coord{X: -1, Y: -1}
 	switch move {
 	case "up":
 		output.X = position.X
@@ -134,12 +134,12 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 	// iterate through all the heads, if d^2 is == 2 or 4 then there is a possibility of h2h
 	// find first head that matches the above condition
 	// limitation: only considers one possible h2h at a time - if there are >1 possible h2h i only consider one for now
-	var enemyHead = datatypes.Coord{-1, -1}
+	var enemyHead = datatypes.Coord{X: -1, Y: -1}
 	var enemyLength int32
 	for i := 0; i < len(heads); i++ {
 		distSquared := (heads[i].X-us.X)*(heads[i].X-us.X) + (heads[i].Y-us.Y)*(heads[i].Y-us.Y)
 		if distSquared == 2 || distSquared == 4 {
-			if distSquared == 4 && IsBlocking(board, datatypes.Coord{(us.X + heads[i].X) / 2, (us.Y + heads[i].Y) / 2}) { // special case for d^2=4: make sure there isn't a body between us
+			if distSquared == 4 && IsBlocking(board, datatypes.Coord{X: (us.X + heads[i].X) / 2, Y: (us.Y + heads[i].Y) / 2}) { // special case for d^2=4: make sure there isn't a body between us
 				continue
 			} else {
 				enemyHead = heads[i]
@@ -156,8 +156,12 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 	}
 
 	// before continuing, determine all possible moves since we need it for both cases
-	movesUs := []datatypes.Coord{{us.X, us.Y + 1}, {us.X, us.Y - 1}, {us.X - 1, us.Y}, {us.X + 1, us.Y}}
-	movesEnemy := []datatypes.Coord{{enemyHead.X, enemyHead.Y + 1}, {enemyHead.X, enemyHead.Y - 1}, {enemyHead.X - 1, enemyHead.Y}, {enemyHead.X + 1, enemyHead.Y}}
+	movesUs := []datatypes.Coord{{X: us.X, Y: us.Y + 1}, {X: us.X, Y: us.Y - 1}, {X: us.X - 1, Y: us.Y}, {X: us.X + 1, Y: us.Y}}
+	movesEnemy := []datatypes.Coord{
+		{X: enemyHead.X, Y: enemyHead.Y + 1},
+		{X: enemyHead.X, Y: enemyHead.Y - 1},
+		{X: enemyHead.X - 1, Y: enemyHead.Y},
+		{X: enemyHead.X + 1, Y: enemyHead.Y}}
 
 	// determine if we can beat them
 	if ourLength <= enemyLength {
