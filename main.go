@@ -248,7 +248,7 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 		APIVersion: "1",
 		Author:     "tenmo",
 		Color:      "#4287f5",
-		Head:       "default",
+		Head:       "evil",
 		Tail:       "default",
 	}
 
