@@ -216,12 +216,16 @@ func detectHeadToHead(us *Coord, board *Board, ourLength int32, validMoves []str
 		// pick something that avoids them because we'll lose
 		for i := 0; i < len(movesUs); i++ {
 			futureUs := movesUs[i]
+			escapes := true
 			for j := 0; j < len(movesEnemy); j++ {
 				futureEnemy := movesEnemy[j]
-				if (futureUs.X != futureEnemy.X || futureUs.Y != futureEnemy.Y) && isMovePossible(us, board, indexToMove(i)) {
-					return indexToMove(i)
+				if (futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y) || !isMovePossible(us, board, indexToMove(i)) {
+					escapes = false
 				}
 			} // end for j
+			if escapes {
+				return indexToMove(i)
+			}
 		} // end for i
 	} else if ourLength > enemyLength {
 		fmt.Printf("in h2h: we win so attempt\n")
