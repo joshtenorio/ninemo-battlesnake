@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/joshtenorio/ninemo-bot/datatypes"
+	//"github.com/joshtenorio/ninemo-bot/floodfill"
 )
 
 /*
@@ -68,6 +69,18 @@ func IsBlocking(board *datatypes.Board, pos datatypes.Coord) bool {
 		}
 	}
 
+	return false
+}
+
+/*
+checks if pos is a hazard
+*/
+func IsHazard(board *datatypes.Board, pos datatypes.Coord) bool {
+	for i := 0; i < len(board.Hazards); i++ {
+		if board.Hazards[i].X == pos.X && board.Hazards[i].Y == pos.Y {
+			return true
+		}
+	}
 	return false
 }
 

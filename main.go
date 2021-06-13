@@ -73,9 +73,12 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	move := "null"
 	move = snake.DetectHeadToHead(&head, &request.Board, request.You.Length, legalMoves)
 	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
-	//if move == "null" {
-	// put hazard code in here
-	//}
+	if move == "null" {
+		// check if head is in a hazard
+		if snake.IsHazard(&request.Board, request.You.Head) {
+			// find closest non-hazard square
+		}
+	}
 
 	// else, find closest food and path to it if possible
 	if move == "null" {
