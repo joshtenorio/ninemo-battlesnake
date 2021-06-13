@@ -74,14 +74,42 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	move = snake.DetectHeadToHead(&head, &request.Board, request.You.Length, legalMoves)
 	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
 	if move == "null" {
-		// check if head is in a hazard
-		if snake.IsHazard(&request.Board, request.You.Head) {
+		// check if head is in a hazard and health is <= half
+		if snake.IsHazard(&request.Board, request.You.Head) && request.You.Health <= 50 {
 			// find closest non-hazard square
+			// check a 5x5 region around our head for the closest non-hazard square (25 loops)
+			safeCoord := datatypes.Coord{X: -1, Y: -1}
+			distSquared := 90000 // TODO: change this to int's max value
+			for i := head.X - 2; i < head.X+2; i++ {
+				for j := head.Y - 2; j < head.Y+2; j++ {
+					// sanity check i and j
+					if i < 0 || i >= request.Board.Width || j < 0 || j >= request.Board.Height {
+						continue
+					}
+					var dx, dy int = i - head.X, j - head.Y
+					if !snake.IsHazard(&request.Board, datatypes.Coord{X: i, Y: j}) && (dx*dx+dy*dy < distSquared) {
+						safeCoord = datatypes.Coord{X: i, Y: j}
+						distSquared = dx*dx + dy*dy
+					}
+				} // end for j
+			} // end for i
+
+			var dx, dy int = safeCoord.X - head.X, safeCoord.Y - head.Y
+			if dx > 0 && snake.IsMovePossible(&head, &request.Board, "right") {
+				move = "right"
+			} else if dx < 0 && snake.IsMovePossible(&head, &request.Board, "left") {
+				move = "left"
+			} else if dy > 0 && snake.IsMovePossible(&head, &request.Board, "up") {
+				move = "up"
+			} else if dy < 0 && snake.IsMovePossible(&head, &request.Board, "down") {
+				move = "down"
+			}
 		}
 	}
 
 	// else, find closest food and path to it if possible
 	if move == "null" {
+		// TODO: put this in a function in snake.go
 		dist := 90000 // TODO: change this to actual max value of int, lookup golang spec
 		food := request.Board.Food
 		var closestFood datatypes.Coord
