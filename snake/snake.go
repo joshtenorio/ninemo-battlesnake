@@ -114,12 +114,10 @@ func IsMovePossible(head *datatypes.Coord, board *datatypes.Board, move string) 
 
 	// check if move collides with other snakes
 	for i := 0; i < len(board.Snakes); i++ {
-		coord := board.Snakes[i].Head
-		if position.X == coord.X && position.Y == coord.Y {
-			return false
-		}
-		for j := 0; j < len(board.Snakes[i].Body); j++ {
-			coord = board.Snakes[i].Body[j]
+		// array includes head, so don't need to check that separately
+		// condition is j < len(body)-1, because the tail will be an open space by the time we move
+		for j := 0; j < len(board.Snakes[i].Body)-1; j++ {
+			coord := board.Snakes[i].Body[j]
 			if position.X == coord.X && position.Y == coord.Y {
 				return false
 			}
