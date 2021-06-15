@@ -58,7 +58,7 @@ checks if pos is blocking (snake body or wall)
 func IsBlocking(board *datatypes.Board, pos datatypes.Coord) bool {
 	// check if snake occupies pos
 	for i := 0; i < len(board.Snakes); i++ {
-		for j := 0; j < len(board.Snakes[i].Body); j++ {
+		for j := 0; j < len(board.Snakes[i].Body)-1; j++ {
 			if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
 				return true
 			}
