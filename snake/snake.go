@@ -141,7 +141,6 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 			lengths = append(lengths, snakes[i].Length)
 		}
 	}
-
 	// iterate through all the heads, if d^2 is == 2 or 4 then there is a possibility of h2h
 	// find first head that matches the above condition
 	// limitation: only considers one possible h2h at a time - if there are >1 possible h2h i only consider one for now
@@ -191,7 +190,7 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 				return IndexToMove(i)
 			}
 		} // end for i
-	} else if ourLength > enemyLength {
+	} else if ourLength > enemyLength { // if we are > we win
 		fmt.Printf("in h2h: we win so attempt\n")
 		// pick the move that results in h2h collision
 		// TODO: if there are two possible squares for a collision and there is food in one of them, go for the one w/ food
