@@ -107,7 +107,7 @@ func IsMovePossible(head *datatypes.Coord, board *datatypes.Board, move string) 
 		position.Y = head.Y
 	}
 
-	return IsBlocking(board, position)
+	return !IsBlocking(board, position)
 }
 
 /*
