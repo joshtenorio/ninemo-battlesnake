@@ -53,20 +53,21 @@ func MoveToCoord(move string, position *datatypes.Coord) datatypes.Coord {
 }
 
 /*
-checks if pos is blocking
+checks if pos is blocking (snake body or wall)
 */
 func IsBlocking(board *datatypes.Board, pos datatypes.Coord) bool {
-	// check if snake
+	// check if snake occupies pos
 	for i := 0; i < len(board.Snakes); i++ {
-		head := board.Snakes[i].Head
-		if head.X == pos.X && head.Y == pos.Y {
-			return true
-		}
-		for j := 0; j < len(board.Snakes[i].Body); j++ {
+		for j := 0; j < len(board.Snakes[i].Body)-1; j++ {
 			if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
 				return true
 			}
 		}
+	} // end outer for
+
+	// check if wall
+	if pos.X < 0 || pos.Y < 0 || pos.X >= board.Width || pos.Y >= board.Height {
+		return true
 	}
 
 	return false
@@ -85,8 +86,7 @@ func IsHazard(board *datatypes.Board, pos datatypes.Coord) bool {
 }
 
 /*
-returns true if move is possible, false if otherwise
-doesn't take into consideration head to head collisions
+returns true if move is physically possible, false if otherwise
 */
 func IsMovePossible(head *datatypes.Coord, board *datatypes.Board, move string) bool {
 	// calculate end position for move
@@ -106,24 +106,7 @@ func IsMovePossible(head *datatypes.Coord, board *datatypes.Board, move string) 
 		position.Y = head.Y
 	}
 
-	// check if move collides with wall
-	xMax, yMax := board.Width, board.Height
-	if position.X >= xMax || position.X < 0 || position.Y >= yMax || position.Y < 0 {
-		return false
-	}
-
-	// check if move collides with other snakes
-	for i := 0; i < len(board.Snakes); i++ {
-		// array includes head, so don't need to check that separately
-		// condition is j < len(body)-1, because the tail will be an open space by the time we move
-		for j := 0; j < len(board.Snakes[i].Body)-1; j++ {
-			coord := board.Snakes[i].Body[j]
-			if position.X == coord.X && position.Y == coord.Y {
-				return false
-			}
-		} // end inner for
-	} // end outer for
-	return true
+	return IsBlocking(board, position)
 }
 
 /*
