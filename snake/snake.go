@@ -58,17 +58,9 @@ checks if pos is blocking (snake body or wall)
 func IsBlocking(board *datatypes.Board, pos datatypes.Coord) bool {
 	// check if snake occupies pos
 	for i := 0; i < len(board.Snakes); i++ {
-		if len(board.Snakes[i].Body) >= 3 {
-			for j := 0; j < len(board.Snakes[i].Body)-1; j++ {
-				if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
-					return true
-				}
-			}
-		} else { // if the length of the snake is <3, then it is the beginning of the game and entire snake isnt rendered yet
-			for j := 0; j < len(board.Snakes[i].Body); j++ {
-				if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
-					return true
-				}
+		for j := 0; j < len(board.Snakes[i].Body); j++ {
+			if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
+				return true
 			}
 		}
 
