@@ -87,6 +87,30 @@ func IsHazard(board *datatypes.Board, pos datatypes.Coord) bool {
 }
 
 /*
+checks if there is food adjacent
+*/
+func IsFoodAdjacent(board *datatypes.Board, pos datatypes.Coord) (adjacent bool, move string) {
+	food := board.Food
+	for i := 0; i < len(food); i++ {
+		x, y := food[i].X, food[i].Y
+		if (x-pos.X*x-pos.X)+(y-pos.Y*y-pos.Y) == 1 { // if d^2 == 1 there is food adjacent
+			adjacent = true
+			// find the move that results in eating the food
+			for j := 0; j < 4; j++ {
+				futurePos := MoveToCoord(IndexToMove(j), &pos)
+				if futurePos.X == x && futurePos.Y == y {
+					move = IndexToMove(j)
+					return
+				}
+			}
+		}
+	}
+	adjacent = false
+	move = "null"
+	return
+}
+
+/*
 returns true if move is physically possible, false if otherwise
 */
 func IsMovePossible(head *datatypes.Coord, board *datatypes.Board, move string) bool {
@@ -174,10 +198,12 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 				return IndexToMove(i)
 			}
 		} // end for i
-	} else if ourLength >= enemyLength { // if we are > we win, if we are == we tie but go for it anyways
+	} else if ourLength > enemyLength { // if we are > we win
 		fmt.Printf("in h2h: we win so attempt\n")
 		// pick the move that results in h2h collision
 		// TODO: if there are two possible squares for a collision and there is food in one of them, go for the one w/ food
+
+		// iterate through all possible moves, if it results in enemy collision then return that move
 		for i := 0; i < len(movesUs); i++ {
 			futureUs := movesUs[i]
 			for j := 0; j < len(movesEnemy); j++ {
@@ -187,6 +213,12 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 				}
 			} // end for j
 		} // end for i
+	} else {
+		// the else case is ourLength == enemyLength, return null since it is possible they will shy away automatically. so we don't need to do anything
+		// additionally if there is food we are fighting over it, since we return null we are using the "go towards food" code to select our move so we'll
+		// probably get that food
+		return "null"
 	}
-	return "null"
+	// TODO: could probably delete the bottom line
+	//return "null"
 }
