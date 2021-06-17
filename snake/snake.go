@@ -158,7 +158,7 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 		{X: enemyHead.X + 1, Y: enemyHead.Y}}
 
 	// determine if we can beat them
-	if ourLength <= enemyLength {
+	if ourLength < enemyLength {
 		fmt.Printf("in h2h: we lose so avoid\n")
 		// pick something that avoids them because we'll lose
 		for i := 0; i < len(movesUs); i++ {
@@ -174,7 +174,7 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 				return IndexToMove(i)
 			}
 		} // end for i
-	} else if ourLength > enemyLength { // if we are > we win
+	} else if ourLength >= enemyLength { // if we are > we win, if we are == we tie but go for it anyways
 		fmt.Printf("in h2h: we win so attempt\n")
 		// pick the move that results in h2h collision
 		// TODO: if there are two possible squares for a collision and there is food in one of them, go for the one w/ food

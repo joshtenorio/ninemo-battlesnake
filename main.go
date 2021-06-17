@@ -75,6 +75,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
 	if move == "null" {
 		// check if head is in a hazard and health is <= half
+		// TODO: move this to snake.go
 		if snake.IsHazard(&request.Board, request.You.Head) && request.You.Health <= 60 {
 			// find closest non-hazard square
 			// check a 5x5 region around our head for the closest non-hazard square (25 loops)
