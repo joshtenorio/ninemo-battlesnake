@@ -4,111 +4,9 @@ import (
 	"fmt"
 
 	"github.com/joshtenorio/ninemo-bot/datatypes"
+	"github.com/joshtenorio/ninemo-bot/snake/api"
 	//"github.com/joshtenorio/ninemo-bot/floodfill"
 )
-
-/*
-returns move corresponding to index
-0: up
-1: down
-2: left
-3: right
-default: null
-*/
-func IndexToMove(num int) string {
-	switch num {
-	case 0:
-		return "up"
-	case 1:
-		return "down"
-	case 2:
-		return "left"
-	case 3:
-		return "right"
-	default:
-		return "null"
-	}
-}
-
-/*
-given a move and initial position, calculate final position
-*/
-func MoveToCoord(move string, position *datatypes.Coord) datatypes.Coord {
-	output := datatypes.Coord{X: -1, Y: -1}
-	switch move {
-	case "up":
-		output.X = position.X
-		output.Y = position.Y + 1
-	case "down":
-		output.X = position.X
-		output.Y = position.Y - 1
-	case "left":
-		output.X = position.X - 1
-		output.Y = position.Y
-	case "right":
-		output.X = position.X + 1
-		output.Y = position.Y
-	}
-	return output
-}
-
-/*
-checks if pos is blocking (snake body or wall)
-*/
-func IsBlocking(board *datatypes.Board, pos datatypes.Coord) bool {
-	// check if snake occupies pos
-	for i := 0; i < len(board.Snakes); i++ {
-		for j := 0; j < len(board.Snakes[i].Body)-1; j++ {
-			if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
-				return true
-			}
-		}
-
-	} // end outer for
-
-	// check if wall
-	if pos.X < 0 || pos.Y < 0 || pos.X >= board.Width || pos.Y >= board.Height {
-		return true
-	}
-
-	return false
-}
-
-/*
-checks if pos is a hazard
-*/
-func IsHazard(board *datatypes.Board, pos datatypes.Coord) bool {
-	for i := 0; i < len(board.Hazards); i++ {
-		if board.Hazards[i].X == pos.X && board.Hazards[i].Y == pos.Y {
-			return true
-		}
-	}
-	return false
-}
-
-/*
-checks if there is food adjacent
-*/
-func IsFoodAdjacent(board *datatypes.Board, pos datatypes.Coord) (adjacent bool, move string) {
-	food := board.Food
-	for i := 0; i < len(food); i++ {
-		x, y := food[i].X, food[i].Y
-		if (x-pos.X*x-pos.X)+(y-pos.Y*y-pos.Y) == 1 { // if d^2 == 1 there is food adjacent
-			adjacent = true
-			// find the move that results in eating the food
-			for j := 0; j < 4; j++ {
-				futurePos := MoveToCoord(IndexToMove(j), &pos)
-				if futurePos.X == x && futurePos.Y == y {
-					move = IndexToMove(j)
-					return
-				}
-			}
-		}
-	}
-	adjacent = false
-	move = "null"
-	return
-}
 
 /*
 returns true if move is physically possible, false if otherwise
@@ -131,7 +29,7 @@ func IsMovePossible(head *datatypes.Coord, board *datatypes.Board, move string) 
 		position.Y = head.Y
 	}
 
-	return !IsBlocking(board, position)
+	return !api.IsBlocking(board, position)
 }
 
 /*
@@ -157,7 +55,7 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 	for i := 0; i < len(heads); i++ {
 		distSquared := (heads[i].X-us.X)*(heads[i].X-us.X) + (heads[i].Y-us.Y)*(heads[i].Y-us.Y)
 		if distSquared == 2 || distSquared == 4 {
-			if distSquared == 4 && IsBlocking(board, datatypes.Coord{X: (us.X + heads[i].X) / 2, Y: (us.Y + heads[i].Y) / 2}) { // special case for d^2=4: make sure there isn't a body between us
+			if distSquared == 4 && api.IsBlocking(board, datatypes.Coord{X: (us.X + heads[i].X) / 2, Y: (us.Y + heads[i].Y) / 2}) { // special case for d^2=4: make sure there isn't a body between us
 				continue
 			} else {
 				enemyHead = heads[i]
@@ -190,12 +88,12 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 			escapes := true
 			for j := 0; j < len(movesEnemy); j++ {
 				futureEnemy := movesEnemy[j]
-				if (futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y) || !IsMovePossible(us, board, IndexToMove(i)) {
+				if (futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y) || !IsMovePossible(us, board, api.IndexToMove(i)) {
 					escapes = false
 				}
 			} // end for j
 			if escapes {
-				return IndexToMove(i)
+				return api.IndexToMove(i)
 			}
 		} // end for i
 	} else if ourLength > enemyLength { // if we are > we win
@@ -208,8 +106,8 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 			futureUs := movesUs[i]
 			for j := 0; j < len(movesEnemy); j++ {
 				futureEnemy := movesEnemy[j]
-				if (futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y) && IsMovePossible(us, board, IndexToMove(i)) {
-					return IndexToMove(i)
+				if (futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y) && IsMovePossible(us, board, api.IndexToMove(i)) {
+					return api.IndexToMove(i)
 				}
 			} // end for j
 		} // end for i

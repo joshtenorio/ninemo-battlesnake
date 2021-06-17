@@ -10,6 +10,7 @@ import (
 
 	"github.com/joshtenorio/ninemo-bot/datatypes"
 	"github.com/joshtenorio/ninemo-bot/snake"
+	"github.com/joshtenorio/ninemo-bot/snake/api"
 )
 
 // HandleIndex is called when your Battlesnake is created and refreshed
@@ -76,7 +77,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	if move == "null" {
 		// check if head is in a hazard and health is <= half
 		// TODO: move this to snake.go
-		if snake.IsHazard(&request.Board, request.You.Head) && request.You.Health <= 60 {
+		if api.IsHazard(&request.Board, request.You.Head) && request.You.Health <= 60 {
 			// find closest non-hazard square
 			// check a 5x5 region around our head for the closest non-hazard square (25 loops)
 			safeCoord := datatypes.Coord{X: -1, Y: -1}
@@ -88,7 +89,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 						continue
 					}
 					var dx, dy int = i - head.X, j - head.Y
-					if !snake.IsHazard(&request.Board, datatypes.Coord{X: i, Y: j}) && (dx*dx+dy*dy < distSquared) {
+					if !api.IsHazard(&request.Board, datatypes.Coord{X: i, Y: j}) && (dx*dx+dy*dy < distSquared) {
 						safeCoord = datatypes.Coord{X: i, Y: j}
 						distSquared = dx*dx + dy*dy
 					}
