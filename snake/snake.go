@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/joshtenorio/ninemo-bot/datatypes"
+	//"github.com/joshtenorio/ninemo-bot/floodfill"
 )
 
 /*
@@ -52,28 +53,65 @@ func MoveToCoord(move string, position *datatypes.Coord) datatypes.Coord {
 }
 
 /*
-checks if pos is blocking
+checks if pos is blocking (snake body or wall)
 */
 func IsBlocking(board *datatypes.Board, pos datatypes.Coord) bool {
-	// check if snake
+	// check if snake occupies pos
 	for i := 0; i < len(board.Snakes); i++ {
-		head := board.Snakes[i].Head
-		if head.X == pos.X && head.Y == pos.Y {
-			return true
-		}
-		for j := 0; j < len(board.Snakes[i].Body); j++ {
+		for j := 0; j < len(board.Snakes[i].Body)-1; j++ {
 			if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
 				return true
 			}
 		}
+
+	} // end outer for
+
+	// check if wall
+	if pos.X < 0 || pos.Y < 0 || pos.X >= board.Width || pos.Y >= board.Height {
+		return true
 	}
 
 	return false
 }
 
 /*
-returns true if move is possible, false if otherwise
-doesn't take into consideration head to head collisions
+checks if pos is a hazard
+*/
+func IsHazard(board *datatypes.Board, pos datatypes.Coord) bool {
+	for i := 0; i < len(board.Hazards); i++ {
+		if board.Hazards[i].X == pos.X && board.Hazards[i].Y == pos.Y {
+			return true
+		}
+	}
+	return false
+}
+
+/*
+checks if there is food adjacent
+*/
+func IsFoodAdjacent(board *datatypes.Board, pos datatypes.Coord) (adjacent bool, move string) {
+	food := board.Food
+	for i := 0; i < len(food); i++ {
+		x, y := food[i].X, food[i].Y
+		if (x-pos.X*x-pos.X)+(y-pos.Y*y-pos.Y) == 1 { // if d^2 == 1 there is food adjacent
+			adjacent = true
+			// find the move that results in eating the food
+			for j := 0; j < 4; j++ {
+				futurePos := MoveToCoord(IndexToMove(j), &pos)
+				if futurePos.X == x && futurePos.Y == y {
+					move = IndexToMove(j)
+					return
+				}
+			}
+		}
+	}
+	adjacent = false
+	move = "null"
+	return
+}
+
+/*
+returns true if move is physically possible, false if otherwise
 */
 func IsMovePossible(head *datatypes.Coord, board *datatypes.Board, move string) bool {
 	// calculate end position for move
@@ -93,26 +131,7 @@ func IsMovePossible(head *datatypes.Coord, board *datatypes.Board, move string) 
 		position.Y = head.Y
 	}
 
-	// check if move collides with wall
-	xMax, yMax := board.Width, board.Height
-	if position.X >= xMax || position.X < 0 || position.Y >= yMax || position.Y < 0 {
-		return false
-	}
-
-	// check if move collides with other snakes
-	for i := 0; i < len(board.Snakes); i++ {
-		coord := board.Snakes[i].Head
-		if position.X == coord.X && position.Y == coord.Y {
-			return false
-		}
-		for j := 0; j < len(board.Snakes[i].Body); j++ {
-			coord = board.Snakes[i].Body[j]
-			if position.X == coord.X && position.Y == coord.Y {
-				return false
-			}
-		} // end inner for
-	} // end outer for
-	return true
+	return !IsBlocking(board, position)
 }
 
 /*
@@ -130,7 +149,6 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 			lengths = append(lengths, snakes[i].Length)
 		}
 	}
-
 	// iterate through all the heads, if d^2 is == 2 or 4 then there is a possibility of h2h
 	// find first head that matches the above condition
 	// limitation: only considers one possible h2h at a time - if there are >1 possible h2h i only consider one for now
@@ -164,7 +182,7 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 		{X: enemyHead.X + 1, Y: enemyHead.Y}}
 
 	// determine if we can beat them
-	if ourLength <= enemyLength {
+	if ourLength < enemyLength {
 		fmt.Printf("in h2h: we lose so avoid\n")
 		// pick something that avoids them because we'll lose
 		for i := 0; i < len(movesUs); i++ {
@@ -180,10 +198,12 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 				return IndexToMove(i)
 			}
 		} // end for i
-	} else if ourLength > enemyLength {
+	} else if ourLength > enemyLength { // if we are > we win
 		fmt.Printf("in h2h: we win so attempt\n")
 		// pick the move that results in h2h collision
 		// TODO: if there are two possible squares for a collision and there is food in one of them, go for the one w/ food
+
+		// iterate through all possible moves, if it results in enemy collision then return that move
 		for i := 0; i < len(movesUs); i++ {
 			futureUs := movesUs[i]
 			for j := 0; j < len(movesEnemy); j++ {
@@ -193,6 +213,12 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 				}
 			} // end for j
 		} // end for i
+	} else {
+		// the else case is ourLength == enemyLength, return null since it is possible they will shy away automatically. so we don't need to do anything
+		// additionally if there is food we are fighting over it, since we return null we are using the "go towards food" code to select our move so we'll
+		// probably get that food
+		// TODO: this else case is also pretty redundant since we return null anyways
+		return "null"
 	}
 	return "null"
 }
