@@ -217,8 +217,8 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 		// the else case is ourLength == enemyLength, return null since it is possible they will shy away automatically. so we don't need to do anything
 		// additionally if there is food we are fighting over it, since we return null we are using the "go towards food" code to select our move so we'll
 		// probably get that food
+		// TODO: this else case is also pretty redundant since we return null anyways
 		return "null"
 	}
-	// TODO: could probably delete the bottom line
-	//return "null"
+	return "null"
 }
