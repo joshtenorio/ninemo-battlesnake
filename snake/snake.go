@@ -159,3 +159,35 @@ func MoveInDirection(head *datatypes.Coord, target *datatypes.Coord, board *data
 		return "null"
 	}
 }
+
+func HandleHazard(head *datatypes.Coord, health int, board *datatypes.Board) string {
+	if api.IsHazard(board, *head) && health <= 60 {
+
+		// first, check if there is food adjacent
+		foodAdjacent, move := api.IsFoodAdjacent(board, *head)
+		if foodAdjacent {
+			return move
+		}
+
+		// find closest non-hazard square
+		// check a 5x5 region around our head for the closest non-hazard square (25 loops)
+		safeCoord := datatypes.Coord{X: -1, Y: -1}
+		distSquared := 90000 // TODO: change this to int's max value
+		for i := head.X - 2; i < head.X+2; i++ {
+			for j := head.Y - 2; j < head.Y+2; j++ {
+				// sanity check i and j
+				if i < 0 || i >= board.Width || j < 0 || j >= board.Height {
+					continue
+				}
+				var dx, dy int = i - head.X, j - head.Y
+				if !api.IsHazard(board, datatypes.Coord{X: i, Y: j}) && (dx*dx+dy*dy < distSquared) {
+					safeCoord = datatypes.Coord{X: i, Y: j}
+					distSquared = dx*dx + dy*dy
+				}
+			} // end for j
+		} // end for i
+
+		return MoveInDirection(head, &safeCoord, board)
+	}
+	return "null"
+}
