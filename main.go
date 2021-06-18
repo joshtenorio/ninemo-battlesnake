@@ -61,7 +61,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	// if there is a potential head to head, go for it if we can win, else avoid
 	move := "null"
 	move = snake.DetectHeadToHead(&head, &request.Board, request.You.Length)
-
+	fmt.Printf("brraaaaarr\n")
 	// else, find closest food and path to it if possible
 	if move == "null" {
 		// TODO: put this in a function in snake.go
@@ -76,9 +76,11 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// attempt to go in the direction of the closestFood
+		fmt.Printf("hehe\n")
 		move = snake.MoveInDirection(&head, &closestFood, &request.Board)
+		fmt.Printf("yay\n")
 	}
-
+	fmt.Printf("aaaa\n")
 	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
 	if move == "null" {
 		// check if head is in a hazard and health is <= half
@@ -105,7 +107,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 			move = snake.MoveInDirection(&head, &safeCoord, &request.Board)
 		} // end if "in hazard and health low"
 	} // end if move == null
-
+	fmt.Printf("brrrr\n")
 	// if all other cases don't apply just pick a random move
 	var legalMoves []string
 	if snake.IsMovePossible(&head, &request.Board, "up") {

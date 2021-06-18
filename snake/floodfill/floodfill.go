@@ -18,6 +18,7 @@ func CountFreeSpaces(board *datatypes.Board, pos datatypes.Coord, maxDist int) i
 	count := 0
 	queue := make([]datatypes.Coord, 0)
 	queue = append(queue, pos)
+	visited := make([]datatypes.Coord, 0)
 	for len(queue) != 0 {
 		n := queue[0]     // set n to first coord in queue
 		queue = queue[1:] // pop queue
@@ -26,13 +27,25 @@ func CountFreeSpaces(board *datatypes.Board, pos datatypes.Coord, maxDist int) i
 			dist *= -1
 		}
 
-		if !api.IsBlocking(board, n) && dist < maxDist {
+		if !api.IsBlocking(board, n) && dist < maxDist && !LinearSearch(visited, n) {
 			count++
 			queue = append(queue, api.MoveToCoord("up", &n))
 			queue = append(queue, api.MoveToCoord("down", &n))
 			queue = append(queue, api.MoveToCoord("left", &n))
 			queue = append(queue, api.MoveToCoord("right", &n))
+
+			visited = append(visited, n)
 		}
 	} // end for len(queue) != 0
 	return count
+}
+
+// helper function for CountFreeSpaces
+func LinearSearch(list []datatypes.Coord, key datatypes.Coord) bool {
+	for i := 0; i < len(list); i++ {
+		if list[i].X == key.X && list[i].Y == key.Y {
+			return true
+		}
+	}
+	return false
 }
