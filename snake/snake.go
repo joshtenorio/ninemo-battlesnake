@@ -122,13 +122,26 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 				}
 			} // end for j
 		} // end for i
-	} else {
-		// the else case is ourLength == enemyLength, return null since it is possible they will shy away automatically. so we don't need to do anything
-		// additionally if there is food we are fighting over it, since we return null we are using the "go towards food" code to select our move so we'll
-		// probably get that food
-		// TODO: this else case is also pretty redundant since we return null anyways
-		return "null"
-	}
+	} else { // if lengths are == and there is a food adjacent to us, go for the food even if h2h collision possible
+		IsFoodAdjacent, move := api.IsFoodAdjacent(board, *us)
+		if IsFoodAdjacent {
+			return move
+		} else { // if food is not adjacent, avoid collision
+			for i := 0; i < len(movesUs); i++ {
+				futureUs := movesUs[i]
+				escapes := true
+				for j := 0; j < len(movesEnemy); j++ {
+					futureEnemy := movesEnemy[j]
+					if (futureUs.X == futureEnemy.X && futureUs.Y == futureEnemy.Y) || !IsMovePossible(us, board, api.IndexToMove(i)) {
+						escapes = false
+					}
+				} // end for j
+				if escapes {
+					return api.IndexToMove(i)
+				}
+			} // end for i
+		}
+	} // end ourLength __ enemyLength else
 	return "null"
 }
 
