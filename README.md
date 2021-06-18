@@ -2,10 +2,14 @@
 [Battlesnake](https://play.battlesnake.com/) written using Go.
 
 [Battlesnake server url (heroku)](https://ninemo-bot.herokuapp.com/)
+
 [Battlesnake page](https://play.battlesnake.com/u/tenmo/ninemo/)
 
 - the live version is on branch `main`
 - in-progress code is on branch `dev`
+
+## Strategy
+1. WIP section
 
 ## Resources I used
 
