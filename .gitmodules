@@ -1,0 +1,3 @@
+[submodule "contrib/battle-snake-board-generator"]
+	path = contrib/battle-snake-board-generator
+	url = https://github.com/Nettogrof/battle-snake-board-generator.git
