@@ -12,9 +12,9 @@ func IsMoveTrap(board *datatypes.Board, head *datatypes.Coord, move string, sear
 	futurePos := api.MoveToCoord(move, head)
 	numFreeSpaces := floodfill.CountFreeSpaces(board, futurePos, searchDist)
 	if numFreeSpaces < minSpaces {
-		return false
-	} else {
 		return true
+	} else {
+		return false
 	}
 }
 
@@ -130,4 +130,19 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 		return "null"
 	}
 	return "null"
+}
+
+func MoveInDirection(head *datatypes.Coord, target *datatypes.Coord, board *datatypes.Board) string {
+	var dx, dy int = target.X - head.X, target.Y - head.Y
+	if dx > 0 && IsMovePossible(head, board, "right") {
+		return "right"
+	} else if dx < 0 && IsMovePossible(head, board, "left") {
+		return "left"
+	} else if dy > 0 && IsMovePossible(head, board, "up") {
+		return "up"
+	} else if dy < 0 && IsMovePossible(head, board, "down") {
+		return "down"
+	} else {
+		return "null"
+	}
 }
