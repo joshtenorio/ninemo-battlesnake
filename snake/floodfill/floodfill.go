@@ -11,8 +11,10 @@ maxDist is essentially dx+dy, or the number of moves it takes to reach a coord f
 uses slices as a way to implement queues
 references:
 https://en.wikipedia.org/wiki/Flood_fill#Moving_the_recursion_into_a_data_structure
+
+TODO: not very efficient so look for other ways to implement floodfill
 */
-func GetNumFreeSpaces(board *datatypes.Board, pos datatypes.Coord, maxDist int) int {
+func CountFreeSpaces(board *datatypes.Board, pos datatypes.Coord, maxDist int) int {
 	count := 0
 	queue := make([]datatypes.Coord, 0)
 	queue = append(queue, pos)

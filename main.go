@@ -72,7 +72,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 
 	// if there is a potential head to head, go for it if we can win, else avoid
 	move := "null"
-	move = snake.DetectHeadToHead(&head, &request.Board, request.You.Length, legalMoves)
+	move = snake.DetectHeadToHead(&head, &request.Board, request.You.Length)
 	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
 	if move == "null" {
 		// check if head is in a hazard and health is <= half

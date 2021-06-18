@@ -5,8 +5,18 @@ import (
 
 	"github.com/joshtenorio/ninemo-bot/datatypes"
 	"github.com/joshtenorio/ninemo-bot/snake/api"
-	//"github.com/joshtenorio/ninemo-bot/floodfill"
+	"github.com/joshtenorio/ninemo-bot/snake/floodfill"
 )
+
+func IsMoveTrap(board *datatypes.Board, head *datatypes.Coord, move string, searchDist int, minSpaces int) bool {
+	futurePos := api.MoveToCoord(move, head)
+	numFreeSpaces := floodfill.CountFreeSpaces(board, futurePos, searchDist)
+	if numFreeSpaces < minSpaces {
+		return false
+	} else {
+		return true
+	}
+}
 
 /*
 returns true if move is physically possible, false if otherwise
@@ -36,7 +46,7 @@ func IsMovePossible(head *datatypes.Coord, board *datatypes.Board, move string) 
 returns valid move if we win a head-to-head, else returns a move that avoids it
 if there is no head-to-head, return null
 */
-func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int32, validMoves []string) string {
+func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int32) string {
 	// get list of heads that are close to us (not including ourself)
 	var heads []datatypes.Coord
 	var lengths []int32
@@ -55,7 +65,8 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 	for i := 0; i < len(heads); i++ {
 		distSquared := (heads[i].X-us.X)*(heads[i].X-us.X) + (heads[i].Y-us.Y)*(heads[i].Y-us.Y)
 		if distSquared == 2 || distSquared == 4 {
-			if distSquared == 4 && api.IsBlocking(board, datatypes.Coord{X: (us.X + heads[i].X) / 2, Y: (us.Y + heads[i].Y) / 2}) { // special case for d^2=4: make sure there isn't a body between us
+			if distSquared == 4 && api.IsBlocking(board, datatypes.Coord{X: (us.X + heads[i].X) / 2, Y: (us.Y + heads[i].Y) / 2}) {
+				// special case for d^2=4: make sure there isn't a body between us
 				continue
 			} else {
 				enemyHead = heads[i]
