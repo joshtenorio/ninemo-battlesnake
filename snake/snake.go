@@ -134,13 +134,13 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 
 func MoveInDirection(head *datatypes.Coord, target *datatypes.Coord, board *datatypes.Board) string {
 	var dx, dy int = target.X - head.X, target.Y - head.Y
-	if dx > 0 && IsMovePossible(head, board, "right") {
+	if dx > 0 && IsMovePossible(head, board, "right") && !IsMoveTrap(board, head, "right", 5, 7) {
 		return "right"
-	} else if dx < 0 && IsMovePossible(head, board, "left") {
+	} else if dx < 0 && IsMovePossible(head, board, "left") && !IsMoveTrap(board, head, "left", 5, 7) {
 		return "left"
-	} else if dy > 0 && IsMovePossible(head, board, "up") {
+	} else if dy > 0 && IsMovePossible(head, board, "up") && !IsMoveTrap(board, head, "up", 5, 7) {
 		return "up"
-	} else if dy < 0 && IsMovePossible(head, board, "down") {
+	} else if dy < 0 && IsMovePossible(head, board, "down") && !IsMoveTrap(board, head, "down", 5, 7) {
 		return "down"
 	} else {
 		return "null"
