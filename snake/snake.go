@@ -195,3 +195,32 @@ func HandleHazard(head *datatypes.Coord, health int, board *datatypes.Board) str
 	}
 	return "null"
 }
+
+func HandleDefaultMove(head *datatypes.Coord, board *datatypes.Board, searchDist int, minSpaces int) string {
+	// if all other cases don't apply, pick a move that results in moving towards the most amount of space
+	var spaces []int
+	var legalMoves []string
+	if IsMovePossible(head, board, "up") && !IsMoveTrap(board, head, "up", searchDist, minSpaces) {
+		legalMoves = append(legalMoves, "up")
+		spaces = append(spaces, floodfill.CountFreeSpaces(board, api.MoveToCoord("up", head), searchDist))
+	} else if IsMovePossible(head, board, "down") && !IsMoveTrap(board, head, "down", searchDist, minSpaces) {
+		legalMoves = append(legalMoves, "down")
+		spaces = append(spaces, floodfill.CountFreeSpaces(board, api.MoveToCoord("down", head), searchDist))
+	} else if IsMovePossible(head, board, "left") && !IsMoveTrap(board, head, "left", searchDist, minSpaces) {
+		legalMoves = append(legalMoves, "left")
+		spaces = append(spaces, floodfill.CountFreeSpaces(board, api.MoveToCoord("left", head), searchDist))
+	} else if IsMovePossible(head, board, "right") && !IsMoveTrap(board, head, "right", searchDist, minSpaces) {
+		legalMoves = append(legalMoves, "right")
+		spaces = append(spaces, floodfill.CountFreeSpaces(board, api.MoveToCoord("right", head), searchDist))
+	}
+
+	bestMove := "null"
+	maxSpaces := -1
+	for i := 0; i < len(legalMoves); i++ {
+		if spaces[i] > maxSpaces {
+			bestMove = legalMoves[i]
+			maxSpaces = spaces[i]
+		}
+	}
+	return bestMove
+}

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 
@@ -83,20 +82,9 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 		move = snake.MoveInDirection(&head, &closestFood, &request.Board)
 	}
 
-	// if all other cases don't apply just pick a random move
-	var legalMoves []string
-	if snake.IsMovePossible(&head, &request.Board, "up") && !snake.IsMoveTrap(&request.Board, &request.You.Head, "up", 5, 6) {
-		legalMoves = append(legalMoves, "up")
-	} else if snake.IsMovePossible(&head, &request.Board, "down") && !snake.IsMoveTrap(&request.Board, &request.You.Head, "down", 5, 6) {
-		legalMoves = append(legalMoves, "down")
-	} else if snake.IsMovePossible(&head, &request.Board, "left") && !snake.IsMoveTrap(&request.Board, &request.You.Head, "left", 5, 6) {
-		legalMoves = append(legalMoves, "left")
-	} else if snake.IsMovePossible(&head, &request.Board, "right") && !snake.IsMoveTrap(&request.Board, &request.You.Head, "right", 5, 6) {
-		legalMoves = append(legalMoves, "right")
-	}
-
+	// if all other cases don't apply, pick a move that results in moving towards the most amount of space
 	if move == "null" {
-		move = legalMoves[rand.Intn(len(legalMoves))]
+		move = snake.HandleDefaultMove(&request.You.Head, &request.Board, 5, 6)
 	}
 
 	// set up response
