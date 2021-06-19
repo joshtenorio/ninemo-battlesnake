@@ -90,7 +90,7 @@ func IsFoodAdjacent(board *datatypes.Board, pos datatypes.Coord) (adjacent bool,
 	food := board.Food
 	for i := 0; i < len(food); i++ {
 		x, y := food[i].X, food[i].Y
-		if (x-pos.X*x-pos.X)+(y-pos.Y*y-pos.Y) == 1 { // if d^2 == 1 there is food adjacent
+		if ((x-pos.X)*(x-pos.X))+((y-pos.Y)*(y-pos.Y)) == 1 { // if d^2 == 1 there is food adjacent
 			adjacent = true
 			// find the move that results in eating the food
 			for j := 0; j < 4; j++ {
@@ -100,7 +100,7 @@ func IsFoodAdjacent(board *datatypes.Board, pos datatypes.Coord) (adjacent bool,
 					return
 				}
 			}
-		}
+		} // end if food adjacent
 	}
 	adjacent = false
 	move = "null"
