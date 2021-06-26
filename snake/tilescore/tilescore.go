@@ -6,7 +6,16 @@ import (
 	//"github.com/joshtenorio/ninemo-bot/snake/api"
 )
 
-func CalculateTileScore(board *datatypes.Board, tile datatypes.Coord, ffMaxSearch int, ffThreshold int) int {
+type TileScoreParam {
+	MaxSearchFF int
+	ThresholdFF int
+	ScoreFF 	int
+	ScoreHazard int
+	ScoreFood 	int
+	ScoreH2h 	int
+}
+
+func CalculateTileScore(board *datatypes.Board, tile datatypes.Coord, params TileScoreParam) int {
 	// if tile is in hazard, give it minus
 	// if tile has food, give it positive
 	// use flood fill to calculate score, if number of free tiles is less than threshold it is negative score, else positive score
