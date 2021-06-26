@@ -9,7 +9,8 @@
 - in-progress code is on branch `dev`
 
 ## Strategy
-1. WIP section
+1. Calculate a score for each tile I can move into - favorable tiles will have a higher score, unfavorable tiles will have a lower score
+2. Move into the tile whose score is highest
 
 ## Resources I used
 
