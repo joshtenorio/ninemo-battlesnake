@@ -9,14 +9,14 @@
 - in-progress code is on branch `dev`
 
 ## Strategy
-1. WIP section
+WIP
 
 ## Achievements
-- 65th place Summer League 2021
+- Summer League 2021 65th Place overall (out of 161)
 - Summer League 2021 Gold Tournament Finalist
 
 ## Resources I used
 
 - [Flood fill](https://en.wikipedia.org/wiki/Flood_fill#Moving_the_recursion_into_a_data_structure)
 - [Mojave - local testing](https://github.com/smallsco/mojave)
-- [battlesnake board generator - local testing in specific conditions](https://github.com/Nettogrof/battle-snake-board-generator)
+- [battlesnake board generator - testing for specific conditions](https://github.com/Nettogrof/battle-snake-board-generator)
