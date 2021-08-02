@@ -12,7 +12,7 @@
 WIP
 
 ## Achievements
-- Summer League 2021 65th Place overall (out of 161)
+- Summer League 2021 65th Place overall (out of 160)
 - Summer League 2021 Gold Tournament Finalist
 
 ## Resources I used
