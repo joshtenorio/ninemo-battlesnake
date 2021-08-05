@@ -9,7 +9,7 @@
 - in-progress code is on branch `dev`
 
 ## Strategy
-WIP
+I've written a post on my [website](https://joshtenorio.github.io/posts/battlesnakesummer21/) that goes over ninemo's strategy during Summer League 2021.
 
 ## Achievements
 - Summer League 2021 65th Place overall (out of 160)
