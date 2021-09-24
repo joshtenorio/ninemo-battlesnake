@@ -19,8 +19,8 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 		APIVersion: "1",
 		Author:     "tenmo",
 		Color:      "#4287f5",
-		Head:       "evil",
-		Tail:       "sharp",
+		Head:       "villain",
+		Tail:       "mystic-moon",
 	}
 
 	w.Header().Set("Content-Type", "application/json")
