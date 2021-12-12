@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/joshtenorio/ninemo-bot/datatypes"
+	"github.com/joshtenorio/ninemo-battlesnake/datatypes"
 )
 
 /*

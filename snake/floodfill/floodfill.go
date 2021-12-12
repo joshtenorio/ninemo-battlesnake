@@ -1,8 +1,8 @@
 package floodfill
 
 import (
-	"github.com/joshtenorio/ninemo-bot/datatypes"
-	"github.com/joshtenorio/ninemo-bot/snake/api"
+	"github.com/joshtenorio/ninemo-battlesnake/datatypes"
+	"github.com/joshtenorio/ninemo-battlesnake/snake/api"
 )
 
 /*

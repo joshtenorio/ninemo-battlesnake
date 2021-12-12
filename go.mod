@@ -1,4 +1,4 @@
-module github.com/joshtenorio/ninemo-bot
+module github.com/joshtenorio/ninemo-battlesnake
 
 go 1.16
 

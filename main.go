@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/joshtenorio/ninemo-bot/datatypes"
-	"github.com/joshtenorio/ninemo-bot/snake"
+	"github.com/joshtenorio/ninemo-battlesnake/datatypes"
+	"github.com/joshtenorio/ninemo-battlesnake/snake"
 )
 
 // HandleIndex is called when your Battlesnake is created and refreshed

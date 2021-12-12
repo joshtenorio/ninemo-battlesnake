@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/joshtenorio/ninemo-bot/datatypes"
-	"github.com/joshtenorio/ninemo-bot/snake/api"
-	"github.com/joshtenorio/ninemo-bot/snake/floodfill"
+	"github.com/joshtenorio/ninemo-battlesnake/datatypes"
+	"github.com/joshtenorio/ninemo-battlesnake/snake/api"
+	"github.com/joshtenorio/ninemo-battlesnake/snake/floodfill"
 )
 
 func OnMove(w http.ResponseWriter, r *http.Request) {
