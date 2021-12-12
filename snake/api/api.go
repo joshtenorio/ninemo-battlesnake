@@ -106,3 +106,35 @@ func IsFoodAdjacent(board *datatypes.Board, pos datatypes.Coord) (adjacent bool,
 	move = "null"
 	return
 }
+
+func Imax(a int, b int) int {
+	if a < b {
+		return b
+	} else {
+		return a
+	}
+}
+
+func Imin(a int, b int) int {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func GetMax(evalScores [4]int) int {
+	max := evalScores[0]
+	for i := 1; i < len(evalScores); i++ {
+		max = Imax(max, evalScores[i])
+	}
+	return max
+}
+
+func GetMin(evalScores [4]int) int {
+	min := evalScores[0]
+	for i := 1; i < len(evalScores); i++ {
+		min = Imin(min, evalScores[i])
+	}
+	return min
+}
