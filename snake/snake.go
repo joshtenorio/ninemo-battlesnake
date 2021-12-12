@@ -96,7 +96,7 @@ func IsMovePossible(head *datatypes.Coord, board *datatypes.Board, move string) 
 		position.Y = head.Y
 	}
 
-	return !api.IsBlocking(board, position)
+	return !api.IsBlocking(board, position, false)
 }
 
 /*
@@ -122,7 +122,7 @@ func DetectHeadToHead(us *datatypes.Coord, board *datatypes.Board, ourLength int
 	for i := 0; i < len(heads); i++ {
 		distSquared := (heads[i].X-us.X)*(heads[i].X-us.X) + (heads[i].Y-us.Y)*(heads[i].Y-us.Y)
 		if distSquared == 2 || distSquared == 4 {
-			if distSquared == 4 && api.IsBlocking(board, datatypes.Coord{X: (us.X + heads[i].X) / 2, Y: (us.Y + heads[i].Y) / 2}) {
+			if distSquared == 4 && api.IsBlocking(board, datatypes.Coord{X: (us.X + heads[i].X) / 2, Y: (us.Y + heads[i].Y) / 2}, false) {
 				// special case for d^2=4: make sure there isn't a body between us
 				continue
 			} else {

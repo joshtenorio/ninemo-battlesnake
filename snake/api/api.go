@@ -51,17 +51,30 @@ func MoveToCoord(move string, position *datatypes.Coord) datatypes.Coord {
 
 /*
 checks if pos is blocking (snake body or wall)
+if minimax == true (ie, step mode), then don't count the head but count tail
+if minimax == false (ie, realtime), do count the head but don't count the tail
 */
-func IsBlocking(board *datatypes.Board, pos datatypes.Coord) bool {
+func IsBlocking(board *datatypes.Board, pos datatypes.Coord, minimax bool) bool {
 	// check if snake occupies pos
-	for i := 0; i < len(board.Snakes); i++ {
-		for j := 0; j < len(board.Snakes[i].Body)-1; j++ {
-			if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
-				return true
+	if minimax {
+		for i := 0; i < len(board.Snakes); i++ {
+			for j := 1; j < len(board.Snakes[i].Body); j++ {
+				if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
+					return true
+				}
 			}
-		}
 
-	} // end outer for
+		}
+	} else {
+		for i := 0; i < len(board.Snakes); i++ {
+			for j := 0; j < len(board.Snakes[i].Body)-1; j++ {
+				if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {
+					return true
+				}
+			}
+
+		}
+	}
 
 	// check if wall
 	if pos.X < 0 || pos.Y < 0 || pos.X >= board.Width || pos.Y >= board.Height {
@@ -77,6 +90,15 @@ checks if pos is a hazard
 func IsHazard(board *datatypes.Board, pos datatypes.Coord) bool {
 	for i := 0; i < len(board.Hazards); i++ {
 		if board.Hazards[i].X == pos.X && board.Hazards[i].Y == pos.Y {
+			return true
+		}
+	}
+	return false
+}
+
+func IsFood(board *datatypes.Board, pos datatypes.Coord) bool {
+	for i := 0; i < len(board.Food); i++ {
+		if board.Food[i].X == pos.X && board.Food[i].Y == pos.Y {
 			return true
 		}
 	}
@@ -137,4 +159,8 @@ func GetMin(evalScores [4]int) int {
 		min = Imin(min, evalScores[i])
 	}
 	return min
+}
+
+func RemoveCoord(slice []datatypes.Coord, s int) []datatypes.Coord {
+	return append(slice[:s], slice[s+1:]...)
 }
