@@ -51,12 +51,12 @@ func MoveToCoord(move string, position *datatypes.Coord) datatypes.Coord {
 
 /*
 checks if pos is blocking (snake body or wall)
-if minimax == true (ie, step mode), then don't count the head but count tail
-if minimax == false (ie, realtime), do count the head but don't count the tail
+if stepmode == true (ie, minimax), then don't count the head but count tail
+if stepmode == false (ie, realtime), do count the head but don't count the tail
 */
-func IsBlocking(board *datatypes.Board, pos datatypes.Coord, minimax bool) bool {
+func IsBlocking(board *datatypes.Board, pos datatypes.Coord, stepmode bool) bool {
 	// check if snake occupies pos
-	if minimax {
+	if stepmode {
 		for i := 0; i < len(board.Snakes); i++ {
 			for j := 1; j < len(board.Snakes[i].Body); j++ {
 				if board.Snakes[i].Body[j].X == pos.X && board.Snakes[i].Body[j].Y == pos.Y {

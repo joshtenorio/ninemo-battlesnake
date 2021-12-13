@@ -1,12 +1,16 @@
 package minimax
 
 import (
-	"fmt"
-
 	"github.com/joshtenorio/ninemo-battlesnake/datatypes"
 	"github.com/joshtenorio/ninemo-battlesnake/snake/api"
 )
 
+/*
+- board 		: the current position
+- depth			: self explanatory
+- maximizing 	: the current snake
+- ourId 		: always refers to our snake, used for evaluating the position from our perspective
+*/
 func Minimax(board datatypes.Board, depth int, maximizing bool, ourId string) int {
 	id := ""
 	if maximizing {
@@ -21,23 +25,23 @@ func Minimax(board datatypes.Board, depth int, maximizing bool, ourId string) in
 		}
 	}
 	if depth == 0 || IsGameResolved(&board) {
-		return Eval(board, id)
+		return Eval(board, ourId)
 	}
 
 	if maximizing {
 		var scores [4]int
-		scores[0] = Minimax(MakeMove(id, "up", board), depth-1, false, id)
-		scores[1] = Minimax(MakeMove(id, "down", board), depth-1, false, id)
-		scores[2] = Minimax(MakeMove(id, "left", board), depth-1, false, id)
-		scores[3] = Minimax(MakeMove(id, "right", board), depth-1, false, id)
+		scores[0] = Minimax(MakeMove(id, "up", board), depth-1, false, ourId)
+		scores[1] = Minimax(MakeMove(id, "down", board), depth-1, false, ourId)
+		scores[2] = Minimax(MakeMove(id, "left", board), depth-1, false, ourId)
+		scores[3] = Minimax(MakeMove(id, "right", board), depth-1, false, ourId)
 		maxEval := api.GetMax(scores)
 		return maxEval
 	} else {
 		var scores [4]int
-		scores[0] = Minimax(MakeMove(id, "up", board), depth-1, true, id)
-		scores[1] = Minimax(MakeMove(id, "down", board), depth-1, true, id)
-		scores[2] = Minimax(MakeMove(id, "left", board), depth-1, true, id)
-		scores[3] = Minimax(MakeMove(id, "right", board), depth-1, true, id)
+		scores[0] = Minimax(MakeMove(id, "up", board), depth-1, true, ourId)
+		scores[1] = Minimax(MakeMove(id, "down", board), depth-1, true, ourId)
+		scores[2] = Minimax(MakeMove(id, "left", board), depth-1, true, ourId)
+		scores[3] = Minimax(MakeMove(id, "right", board), depth-1, true, ourId)
 		minEval := api.GetMin(scores)
 		return minEval
 	}
@@ -106,7 +110,27 @@ func MakeMove(id string, move string, board datatypes.Board) datatypes.Board {
 }
 
 func Eval(board datatypes.Board, id string) int {
-	fmt.Printf("hello!")
+	var us *datatypes.Battlesnake
+	var opp *datatypes.Battlesnake // so we have quick reference
+	for i := 0; i < len(board.Snakes); i++ {
+		if board.Snakes[i].ID == id {
+			us = &board.Snakes[i]
+		} else {
+			opp = &board.Snakes[i]
+		}
+	}
+	// first, check if either of us are dead
+	if us.Health == 0 {
+		return -999
+	} else if opp.Health == 0 {
+		return 999
+	}
+	// if we are longer, prioritise going for their head
+	if us.Length > opp.Length {
+
+	} else { // else, prioritise getting to food
+
+	}
 	return 0
 }
 
