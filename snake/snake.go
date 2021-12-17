@@ -9,6 +9,7 @@ import (
 	"github.com/joshtenorio/ninemo-battlesnake/datatypes"
 	"github.com/joshtenorio/ninemo-battlesnake/snake/api"
 	"github.com/joshtenorio/ninemo-battlesnake/snake/floodfill"
+	"github.com/joshtenorio/ninemo-battlesnake/snake/minimax"
 )
 
 func OnMove(w http.ResponseWriter, r *http.Request) {
@@ -20,36 +21,65 @@ func OnMove(w http.ResponseWriter, r *http.Request) {
 
 	// define our head
 	head := request.You.Head
-
-	// if there is a potential head to head, go for it if we can win, else avoid
 	move := "null"
-	move = DetectHeadToHead(&head, &request.Board, request.You.Length)
 
-	// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
-	if move == "null" {
-		move = HandleHazard(&head, int(request.You.Health), &request.Board)
-	} // end if move == null
+	if len(request.Board.Snakes) > 2 {
+		// if there is a potential head to head, go for it if we can win, else avoid
+		move = DetectHeadToHead(&head, &request.Board, request.You.Length)
 
-	// else, find closest food and path to it if possible
-	if move == "null" {
-		// TODO: put this in a function in snake.go
-		dist := 90000 // TODO: change this to actual max value of int, lookup golang spec
-		food := request.Board.Food
-		var closestFood datatypes.Coord
-		for i := 0; i < len(food); i++ {
-			if (food[i].X-head.X)*(food[i].X-head.X)+(food[i].Y-head.Y)*(food[i].Y-head.Y) < dist {
-				dist = (food[i].X-head.X)*(food[i].X-head.X) + (food[i].Y-head.Y)*(food[i].Y-head.Y)
-				closestFood = food[i]
+		// else, if we are in hazard and health is <=50, find the closest not-hazard square and move towards it if possible
+		if move == "null" {
+			move = HandleHazard(&head, int(request.You.Health), &request.Board)
+		} // end if move == null
+
+		// else, find closest food and path to it if possible
+		if move == "null" {
+			// TODO: put this in a function in snake.go
+			dist := 90000 // TODO: change this to actual max value of int, lookup golang spec
+			food := request.Board.Food
+			var closestFood datatypes.Coord
+			for i := 0; i < len(food); i++ {
+				if (food[i].X-head.X)*(food[i].X-head.X)+(food[i].Y-head.Y)*(food[i].Y-head.Y) < dist {
+					dist = (food[i].X-head.X)*(food[i].X-head.X) + (food[i].Y-head.Y)*(food[i].Y-head.Y)
+					closestFood = food[i]
+				}
 			}
+
+			// attempt to go in the direction of the closestFood
+			move = MoveInDirection(&head, &closestFood, &request.Board)
 		}
 
-		// attempt to go in the direction of the closestFood
-		move = MoveInDirection(&head, &closestFood, &request.Board)
-	}
+		// if all other cases don't apply, pick a move that results in moving towards the most amount of space
+		if move == "null" {
+			move = HandleDefaultMove(&request.You.Head, &request.Board, 5, 6)
+		}
 
-	// if all other cases don't apply, pick a move that results in moving towards the most amount of space
-	if move == "null" {
-		move = HandleDefaultMove(&request.You.Head, &request.Board, 5, 6)
+	} else {
+		ourId := request.You.ID
+		scores := [4]int{0, 0, 0, 0}
+		scores[0] = minimax.Minimax(minimax.MakeMove(ourId, "up", request.Board), 4, true, ourId)
+		scores[1] = minimax.Minimax(minimax.MakeMove(ourId, "down", request.Board), 4, true, ourId)
+		scores[2] = minimax.Minimax(minimax.MakeMove(ourId, "left", request.Board), 4, true, ourId)
+		scores[3] = minimax.Minimax(minimax.MakeMove(ourId, "right", request.Board), 4, true, ourId)
+		maxScore := api.GetMax(scores)
+		index := 0
+		for i := 0; i < len(scores); i++ {
+			if maxScore == scores[i] {
+				index = i
+				break
+			}
+		}
+		switch index {
+		case 0:
+			move = "up"
+		case 1:
+			move = "down"
+		case 2:
+			move = "left"
+		case 3:
+			move = "right"
+		}
+
 	}
 
 	// set up response

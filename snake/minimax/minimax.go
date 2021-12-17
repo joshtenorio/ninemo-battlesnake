@@ -14,9 +14,10 @@ import (
 */
 func Minimax(board datatypes.Board, depth int, maximizing bool, ourId string) int {
 	id := ""
-	if maximizing {
+	// if we are not maximizing, we want to look at our moves
+	if !maximizing {
 		id = ourId
-	} else {
+	} else { // if we are maximizing, look at opponent's moves
 		snakes := board.Snakes
 		for i := 0; i < len(snakes); i++ {
 			if snakes[i].ID != ourId {
@@ -30,6 +31,7 @@ func Minimax(board datatypes.Board, depth int, maximizing bool, ourId string) in
 	}
 
 	if maximizing {
+		// from opponent's moves, get the maximum score
 		var scores [4]int
 		scores[0] = Minimax(MakeMove(id, "up", board), depth-1, false, ourId)
 		scores[1] = Minimax(MakeMove(id, "down", board), depth-1, false, ourId)
@@ -38,6 +40,7 @@ func Minimax(board datatypes.Board, depth int, maximizing bool, ourId string) in
 		maxEval := api.GetMax(scores)
 		return maxEval
 	} else {
+		// from our moves, get the minimum score
 		var scores [4]int
 		scores[0] = Minimax(MakeMove(id, "up", board), depth-1, true, ourId)
 		scores[1] = Minimax(MakeMove(id, "down", board), depth-1, true, ourId)
