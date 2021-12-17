@@ -55,6 +55,7 @@ func OnMove(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
+		// sadge
 		ourId := request.You.ID
 		scores := [4]int{0, 0, 0, 0}
 		scores[0] = minimax.Minimax(minimax.MakeMove(ourId, "up", request.Board), 4, true, ourId)
