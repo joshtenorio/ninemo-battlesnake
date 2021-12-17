@@ -2,6 +2,8 @@ package astar
 
 import (
 	"github.com/joshtenorio/ninemo-battlesnake/datatypes"
+	"github.com/joshtenorio/ninemo-battlesnake/snake/api"
+	"github.com/joshtenorio/ninemo-battlesnake/snake/floodfill"
 )
 
 func AStar(start datatypes.Coord, goal datatypes.Coord, board datatypes.Board) []datatypes.Coord {
@@ -12,26 +14,33 @@ func AStar(start datatypes.Coord, goal datatypes.Coord, board datatypes.Board) [
 	gScore[start] = 0
 
 	fScore := InitializeScoreMap(board.Height, board.Width)
-	fScore[start] = Heuristic(start, goal)
+	fScore[start] = Heuristic(board, start, goal)
 
 	for len(openSet) != 0 {
 		current := SelectCoord(openSet, fScore)
 		if current == goal {
 			return ReconstructPath(cameFrom, current)
 		}
-		// TODO: remove current from openset
+
+		// remove current from openset
+		coordIndex := floodfill.LinearSearch(openSet, current)
+		openSet = api.RemoveCoord(openSet, coordIndex)
+
 		neighbors := GenerateNeighbors(current)
 		for i := 0; i < len(neighbors); i++ {
 			tentativeGScore := 1 + gScore[current]
 			if tentativeGScore < gScore[neighbors[i]] {
 				cameFrom[neighbors[i]] = current
 				gScore[neighbors[i]] = tentativeGScore
-				fScore[neighbors[i]] = tentativeGScore + Heuristic(neighbors[i], goal)
+				fScore[neighbors[i]] = tentativeGScore + Heuristic(board, neighbors[i], goal)
 			}
-			// TODO: if neighbors[i] is not in openSet, add it to openSet
-		}
 
-	}
+			if floodfill.LinearSearch(openSet, neighbors[i]) == -1 {
+				openSet = append(openSet, neighbors[i])
+			}
+		}
+	} // end while emptySet not empty
+
 	// if this is reached, openSet is empty but goal was never reached
 	failure := []datatypes.Coord{{X: 0, Y: 0}}
 	return failure
@@ -42,9 +51,14 @@ func ReconstructPath(cameFrom map[datatypes.Coord]datatypes.Coord, current datat
 	return totalPath
 }
 
-func Heuristic(start datatypes.Coord, goal datatypes.Coord) int {
-	// first, if start is out of bounds or unpathable, give it an ultra high sore
-	return 0
+func Heuristic(board datatypes.Board, start datatypes.Coord, goal datatypes.Coord) int {
+	// first, if start is out of bounds or unpathable, give it an ultra high score
+	if api.IsBlocking(&board, start, true) {
+		return 999
+	}
+
+	// otherwise, return the euclidean distance
+	return (start.X-goal.X)*(start.X-goal.X) + (start.Y-goal.Y)*(start.Y-goal.Y)
 }
 
 func InitializeScoreMap(height int, width int) map[datatypes.Coord]int {
