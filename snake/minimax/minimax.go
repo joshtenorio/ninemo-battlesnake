@@ -3,6 +3,7 @@ package minimax
 import (
 	"github.com/joshtenorio/ninemo-battlesnake/datatypes"
 	"github.com/joshtenorio/ninemo-battlesnake/snake/api"
+	"github.com/joshtenorio/ninemo-battlesnake/snake/astar"
 )
 
 /*
@@ -125,13 +126,27 @@ func Eval(board datatypes.Board, id string) int {
 	} else if opp.Health == 0 {
 		return 999
 	}
+
+	score := 0
 	// if we are longer, prioritise going for their head
 	if us.Length > opp.Length {
-
+		score += 100
+		// TODO: use the actual astar thing instead of euclidean distance
+		score += (100 - astar.Heuristic(board, us.Head, opp.Head))
 	} else { // else, prioritise getting to food
-
+		score -= 100
+		// get closest food
+		food := datatypes.Coord{X: -99, Y: -99}
+		for i := 0; i < len(board.Food); i++ {
+			currdist := (us.Head.X-food.X)*(us.Head.X-food.X) + (us.Head.X-food.Y)*(us.Head.X-food.Y)
+			newdist := (us.Head.X-board.Food[i].X)*(us.Head.X-board.Food[i].X) + (us.Head.Y-board.Food[i].Y)*(us.Head.Y-board.Food[i].Y)
+			if newdist <= currdist {
+				food = board.Food[i]
+			}
+		}
+		score += (100 - astar.Heuristic(board, us.Head, food))
 	}
-	return 0
+	return score
 }
 
 func IsGameResolved(board *datatypes.Board) bool {
